@@ -1,0 +1,6 @@
+@CareerGlide.API_HostAddress = http://localhost:5264
+
+GET {{CareerGlide.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
