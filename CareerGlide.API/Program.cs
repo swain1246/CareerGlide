@@ -65,6 +65,7 @@ public class Program
         // Register Dependencies
         services.AddScoped<GenericRepository>();
         services.AddScoped<UserService>();
+        services.AddScoped<AccountService>();
 
 
         // JWT Authentication
