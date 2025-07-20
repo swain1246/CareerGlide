@@ -90,11 +90,18 @@ public class Program
     }
     private static void ConfigureMiddleware(WebApplication app)
     {
-        if (app.Environment.IsDevelopment())
+        //if (app.Environment.IsDevelopment())
+        //{
+        //    app.UseSwagger();
+        //    app.UseSwaggerUI();
+        //}
+
+        app.UseSwagger();
+        app.UseSwaggerUI( c =>
         {
-            app.UseSwagger();
-            app.UseSwaggerUI();
-        }
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "CareerGlide Api");
+            c.RoutePrefix = "swagger";
+        });
 
         app.UseHttpsRedirection();
         // ?? Apply CORS before auth
