@@ -10,7 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace CareerGlide.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     [ApiController]
     public class AccountApiController : ControllerBase
     {
@@ -35,6 +35,8 @@ namespace CareerGlide.API.Controllers
                 var response = await _accountService.StudentRegister(entity);
                 if (response.Success)
                 {
+                    var mailResponse = await _accountService.SendOTPVerifyMail(entity.Email);
+
                     return Ok(response);
                 }
                 else
@@ -48,7 +50,32 @@ namespace CareerGlide.API.Controllers
             }
         }
 
-        [HttpPost("CheckLogin")]
+
+        [HttpPost("resend-otp")]
+        public async Task<IActionResult> ReSendOTP(string Email)
+        {
+            var responce = await _accountService.SendOTPVerifyMail(Email);
+            if (responce.Success)
+            {
+                return Ok(new ApiResponse<string>(null,"Email Send Successfully",true));
+            }
+            return Ok(new ApiResponse<string>(null, "Error while sending mail", false));
+        }
+
+
+
+
+        [HttpPost("Verify-register-otp")]
+        public async Task<IActionResult> VerifyRegisterOTP(string Email, int OTP)
+        {
+            var Response = await _accountService.VerifyRegisterMail(Email, OTP);
+
+                return Ok(Response);
+        }
+
+
+
+        [HttpPost("Login")]
         public async Task<IActionResult> CheckLogin([FromBody] LoginEntity entity)
         {
             if (entity == null)
@@ -75,7 +102,19 @@ namespace CareerGlide.API.Controllers
                 var tokenString = tokenHandler.WriteToken(token);
 
                 response.Data.UserToken = tokenString;
-                return Ok(response);
+                if (response.Data.StatusCode == 200)
+                {
+                    return Ok(response.Data);
+                }
+                else
+                {
+                    UnAuthLogin ErResult = new UnAuthLogin
+                    {
+                        StatusCode = response.Data.StatusCode,
+                        Message = response.Data.Message
+                    };
+                    return Ok(ErResult);
+                }
             }
             return Unauthorized(new ApiResponse<LoginEntity>
             {
