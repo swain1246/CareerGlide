@@ -52,5 +52,32 @@ namespace CareerGlide.API.Services
                 return new ApiResponse<string>(null, $"Error registering student: {ex.Message}", false);
             }
         }
+
+        public async Task<ApiResponse<LoginEntity>> CheckLogin(LoginEntity entity)
+        {
+            try
+            {
+                var parameters = new SqlParameter[]
+                {
+                    new SqlParameter("@Email", SqlDbType.Text) { Value = entity.Email },
+                    new SqlParameter("@Password", SqlDbType.Text) { Value = entity.Password },
+                };
+
+                var result = await _genericRepository.GetAsync<LoginEntity> ("CheckUserLogIn", parameters);
+                if (result == null)
+                {
+                    return new ApiResponse<LoginEntity>(null, "Invalid Email or Password", false);
+                }
+                else
+                {
+                    return new ApiResponse<LoginEntity>(result, "Login Successfull", true);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<LoginEntity>(null, $"Error Login : {ex.Message}", false);
+            }
+        }
     }
 }

@@ -17,4 +17,14 @@
         public string Degree { get; set; }
         public string YearOfPassinf { get; set; }
     }
+
+    public class LoginEntity
+    {
+        public int UserTypeId { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+        public string StudentName { get; set; }
+        public string CompaniName { get; set; }
+        public string? UserToken { get; set; }
+    }
 }
