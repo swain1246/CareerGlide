@@ -1,23 +1,19 @@
-# Use the official .NET SDK image to build the app
+# Stage 1: Build
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-
 WORKDIR /src
 
-# Copy csproj and restore as distinct layers
-COPY ["CareerGlide.API/CareerGlide.API.csproj", "CareerGlide.API/"]
-RUN dotnet restore "CareerGlide.API/CareerGlide.API.csproj"
+# Copy csproj and restore
+COPY ["CareerGlide.API.csproj", "."]
+RUN dotnet restore "CareerGlide.API.csproj"
 
-# Copy the remaining files and build the app
+# Copy the entire project and publish
 COPY . .
-WORKDIR "/src/CareerGlide.API"
 RUN dotnet publish "CareerGlide.API.csproj" -c Release -o /app/publish
 
-# Use the ASP.NET runtime image for running the app
+# Stage 2: Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
-
 WORKDIR /app
 COPY --from=build /app/publish .
 
 EXPOSE 80
-
 ENTRYPOINT ["dotnet", "CareerGlide.API.dll"]
