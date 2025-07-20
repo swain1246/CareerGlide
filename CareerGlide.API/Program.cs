@@ -1,5 +1,6 @@
 using System.Text;
 using CareerGlide.API.Configuration;
+using CareerGlide.API.Entity;
 using CareerGlide.API.Repositories;
 using CareerGlide.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -16,7 +17,7 @@ public class Program
 
         // Add Services to the Container
         ConfigureServices(builder.Services, configuration);
-
+        builder.Services.Configure<EmailConfig>(builder.Configuration.GetSection("EmailConfig"));
         var app = builder.Build();
 
         // Configure Middleware
@@ -64,6 +65,7 @@ public class Program
 
         // Register Dependencies
         services.AddScoped<GenericRepository>();
+        services.AddScoped<SendEmailAPIService>();
         services.AddScoped<UserService>();
         services.AddScoped<AccountService>();
 
