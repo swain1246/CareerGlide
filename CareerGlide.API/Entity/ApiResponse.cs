@@ -18,6 +18,11 @@
         public T Data { get; set; }
 
         /// <summary>
+        /// Optional HTTP status code.
+        /// </summary>
+        public int StatusCode { get; set; }
+
+        /// <summary>
         /// Default constructor.
         /// </summary>
         public ApiResponse() { }
@@ -30,16 +35,18 @@
             Success = true;
             Message = message;
             Data = data;
+            StatusCode = 200;
         }
 
         /// <summary>
-        /// Constructor for failed response.
+        /// Constructor for custom response.
         /// </summary>
-        public ApiResponse(T data, string message, bool success)
+        public ApiResponse(T data, string message, bool success, int statusCode = 200)
         {
             Success = success;
             Message = message;
             Data = data;
+            StatusCode = statusCode;
         }
     }
 }
