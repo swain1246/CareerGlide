@@ -1,17 +1,15 @@
-import { Info, Visibility, VisibilityOff } from '@mui/icons-material';
-import { Button, Tooltip } from 'antd';
-import React, { JSX, useEffect, useState } from 'react';
-import Form from 'react-bootstrap/Form';
+import React, { JSX, useEffect, useState, KeyboardEvent } from 'react';
 import DatePicker from 'react-datepicker';
-import DeleteIcon from '@mui/icons-material/Delete';
 import PhoneInput from 'react-phone-number-input';
+import { Button, Tooltip } from 'antd';
+import { Info, Visibility, VisibilityOff, Delete as DeleteIcon } from '@mui/icons-material';
 
 interface CustomDateEvent<T> {
   value: T;
   name: string;
   type: string;
   dataset?: {
-    [key: string]: any | undefined; // Index signature for optional key-value pairs
+    [key: string]: any | undefined;
   };
 }
 
@@ -23,13 +21,15 @@ type InputFieldProps = {
   type: string;
   placeholder: string;
   value: any;
-  onChangeInput: (e: React.ChangeEvent<HTMLInputElement | CustomSelectDateEvent>) => void; // Define the type for onChangeInput function
+  onChangeInput: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | CustomSelectDateEvent>,
+  ) => void;
   style?: React.CSSProperties;
-  onBlur?: (e: any) => void; // Define the type for onKeyDown function
-  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void; // Define the type for onKeyDown function
+  onBlur?: (e: React.FocusEvent<HTMLElement | HTMLTextAreaElement>) => void;
+  onKeyDown?: (e: KeyboardEvent<HTMLElement | HTMLTextAreaElement>) => void;
   maxLength?: number;
   minLength?: number;
-  error?: string;
+  error?: string | string[];
   disabled?: boolean;
   dataType?: string;
   strict?: boolean;
@@ -46,18 +46,17 @@ type InputFieldProps = {
   dataIndex?: number;
   onAddItem?: (name: string, index: number) => void;
   onRemoveItem?: (name: string, index: number) => void;
+  rows?: number;
 };
 
 const InputField = ({
   label,
   type,
   value,
-  style,
   error,
   tooltipTitle,
   required = false,
   className = '',
-  onBlur,
   multipleFields = false,
   newFieldlabel,
   onRemoveItem,
@@ -68,82 +67,74 @@ const InputField = ({
 
   useEffect(() => {
     if (multipleFields) {
-      if (value && Array.isArray(value) && value.length > 0) {
-        setValuesOption(value);
-      } else {
-        setValuesOption([null]);
-      }
+      setValuesOption(Array.isArray(value) && value.length > 0 ? value : [null]);
     }
   }, [value, multipleFields]);
 
   return (
-    <Form.Group className={`mb-3 group-relative ${className}`}>
-      <div className="d-flex justify-content-between mb-2">
-        <Form.Label className="m-0">
+    <div className={`mb-4 ${className}`}>
+      <div className="flex justify-between items-center mb-2">
+        <label className="block text-sm font-medium text-gray-700">
           {label}
-          {required && <span className="required">* </span>}
+          {required && <span className="text-red-500">*</span>}
           {tooltipTitle && (
-            <Tooltip placement="top" title={tooltipTitle} trigger={'hover'}>
-              <Info fontSize="small" className="cursor-pointer" />
+            <Tooltip title={tooltipTitle}>
+              <Info fontSize="small" className="cursor-pointer ml-1 text-gray-400" />
             </Tooltip>
           )}
-        </Form.Label>
+        </label>
         {multipleFields && (
           <Button
-            className="add-more btn-theme"
-            // variant="custom-link"
+            type="primary"
+            size="small"
             onClick={() => onAddItem && onAddItem(props.name, valuesOption.length)}
+            className="bg-blue-600 text-white"
           >
-            {newFieldlabel ?? `+ Add`}
+            {newFieldlabel ?? '+ Add'}
           </Button>
         )}
       </div>
+
       {multipleFields ? (
-        <>
+        <div className="space-y-3">
           {valuesOption.map((_, index) => (
-            <div className="d-flex mb-3 gap-2" key={index}>
-              <div className="w-100">
+            <div key={index} className="flex gap-2 items-start">
+              <div className="flex-1">
                 <SinglInputField
                   label={label}
                   type={type}
-                  value={value && value[index]}
-                  error={error && error[index]}
-                  style={style}
+                  value={Array.isArray(value) ? value[index] : value}
+                  error={Array.isArray(error) ? error[index] : error}
                   required={required}
                   dataIndex={index}
-                  className={className}
                   multipleFields={multipleFields}
-                  onBlur={onBlur}
                   {...props}
                 />
               </div>
               {valuesOption.length > 1 && (
-                <>
-                  <DeleteIcon
-                    className="delete-icon cursor-pointer ml-1"
-                    fontSize="large"
-                    onClick={() => onRemoveItem && onRemoveItem(props.name, index)}
-                  />
-                </>
+                <button
+                  type="button"
+                  onClick={() => onRemoveItem && onRemoveItem(props.name, index)}
+                  className="text-red-500 hover:text-red-700 mt-1"
+                >
+                  <DeleteIcon fontSize="small" />
+                </button>
               )}
             </div>
           ))}
-        </>
+        </div>
       ) : (
         <SinglInputField
           label={label}
           type={type}
           value={value}
-          style={style}
-          required={required}
-          className={className}
-          multipleFields={multipleFields}
-          onBlur={onBlur}
           error={error}
+          required={required}
+          multipleFields={false}
           {...props}
         />
       )}
-    </Form.Group>
+    </div>
   );
 };
 
@@ -154,162 +145,155 @@ const SinglInputField = ({
   placeholder,
   value,
   onChangeInput,
-  style,
   onKeyDown,
   error,
   dataType,
   strict,
-  tooltipTitle,
   minDate,
   maxDate,
   required = false,
   disabled = false,
   onEmptyNull = false,
   trim = false,
-  className = '',
   onBlur,
   dataIndex,
+  rows = 3,
   ...props
 }: InputFieldProps): JSX.Element => {
-  const isPasswordField = type == 'password';
+  const [showPassword, setShowPassword] = useState(false);
+  const isPasswordField = type === 'password';
 
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-
-  const handleTogglePassword = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const dateString = (epochDate: Date): string => {
-    const date = new Date(epochDate);
-    if (!date) {
-      return '';
-    }
-    const year = date.getFullYear().toString().padStart(4, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-indexed
+  const dateString = (date: Date): string => {
+    if (!date) return '';
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
-
-    // Format the date in yyyy-mm-dd
     return `${year}-${month}-${day}`;
   };
 
   const handleDateInput = (date: Date | null) => {
     if (disabled) return;
+
+    const eventValue = date ? (type === 'date' ? dateString(date) : date.toISOString()) : '';
+
     const target = {
-      name: name,
-      value: date ? (type == 'date' ? dateString(date) : date.toISOString()) : '',
-      type: type,
+      name,
+      value: eventValue,
+      type,
       dataset: {
         type: dataType || type,
-        strict: strict,
+        strict,
         label: label ?? '',
         minDate: minDate ?? '',
         maxDate: maxDate ?? '',
-        required: required,
+        required,
         empty: onEmptyNull,
         index: dataIndex,
       },
     } as CustomSelectDateEvent;
-    const event = {
-      target: target,
-    } as React.ChangeEvent<CustomSelectDateEvent>;
-    onChangeInput(event);
+
+    onChangeInput({ target } as React.ChangeEvent<CustomSelectDateEvent>);
   };
 
-  const getDateValue = (value: any): any => {
+  const getDateValue = (val: any): Date | null => {
     try {
-      if (type == 'date') {
-        return value ? dateString(value as any) : '';
-      } else {
-        return value ? new Date(value as any) : '';
-      }
-    } catch (e) {
-      return '';
+      return val ? new Date(val) : null;
+    } catch {
+      return null;
     }
   };
 
-  const handlePhoneInput = (value?: string) => {
+  const handlePhoneInput = (phoneValue?: string) => {
     if (disabled) return;
+
     const target = {
-      name: name,
-      value: value,
-      type: type,
+      name,
+      value: phoneValue || '',
+      type,
       dataset: {
         type: dataType || type,
-        strict: strict,
+        strict,
         label: label ?? '',
-        required: required,
+        required,
         empty: onEmptyNull,
         index: dataIndex,
       },
     } as CustomSelectDateEvent;
-    const event = {
-      target: target,
-    } as React.ChangeEvent<CustomSelectDateEvent>;
-    onChangeInput(event);
+
+    onChangeInput({ target } as React.ChangeEvent<CustomSelectDateEvent>);
   };
 
-  const passwordType = isPasswordField ? (showPassword ? 'text' : type) : type;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    if (disabled) return;
+    onChangeInput(e as React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>);
+  };
+
+  const commonInputProps = {
+    name,
+    placeholder,
+    disabled,
+    value: value ?? '',
+    onChange: handleChange,
+    onKeyDown,
+    onBlur,
+    className: `w-full px-3 py-2 border rounded-md text-black focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+      error ? 'border-red-500' : 'border-gray-300'
+    } ${disabled ? 'bg-gray-100 cursor-not-allowed text-gray-500' : 'bg-white'}`,
+
+    ...props,
+  };
 
   return (
-    <>
-      {['mobilenumber'].includes(type) ? (
+    <div className="relative">
+      {type === 'mobilenumber' ? (
         <PhoneInput
-          name={name}
-          onChange={handlePhoneInput}
-          onKeyDown={onKeyDown}
+          {...commonInputProps}
           international
           withCountryCallingCode
-          className="form-control"
-          disabled={disabled}
-          {...props}
+          onChange={handlePhoneInput}
+          className="!w-full"
         />
       ) : ['date', 'datetime'].includes(type) ? (
         <DatePicker
-          onChange={handleDateInput}
           selected={getDateValue(value)}
+          onChange={handleDateInput}
           placeholderText={placeholder}
-          name={name}
-          onKeyDown={(e: React.KeyboardEvent) =>
-            disabled ? () => {} : onKeyDown && onKeyDown(e as any)
-          }
-          showTimeSelect={['datetime'].includes(type)}
-          className="form-control"
+          showTimeSelect={type === 'datetime'}
           maxDate={maxDate ? new Date(maxDate) : undefined}
           minDate={minDate ? new Date(minDate) : undefined}
+          className={`w-full ${commonInputProps.className} text-black`}
           disabled={disabled}
-          {...props}
         />
+      ) : type === 'textarea' ? (
+        <textarea {...commonInputProps} rows={rows} />
       ) : (
-        <Form.Control
-          type={passwordType}
-          placeholder={placeholder}
-          name={name}
-          data-type={dataType || type}
-          data-strict={strict}
-          data-empty={onEmptyNull}
-          data-label={label}
-          data-required={required}
-          data-trim={trim}
-          data-index={dataIndex}
-          value={value ?? ''}
-          onChange={(e: React.ChangeEvent) => (disabled ? () => {} : onChangeInput(e as any))}
-          onKeyDown={(e: React.KeyboardEvent) =>
-            disabled ? () => {} : onKeyDown && onKeyDown(e as any)
-          }
-          disabled={disabled}
-          autoComplete={'off'}
-          as={type == 'textarea' ? 'textarea' : undefined}
-          onBlur={(e: React.ChangeEvent) => onBlur && onBlur(e as any)}
-          {...props}
-        />
+        <div className="relative">
+          <input
+            {...commonInputProps}
+            type={isPasswordField ? (showPassword ? 'text' : 'password') : type}
+            data-type={dataType || type}
+            data-strict={strict}
+            data-empty={onEmptyNull}
+            data-trim={trim}
+            data-required={required}
+            data-index={dataIndex}
+            className={`w-full ${commonInputProps.className}`}
+          />
+          {isPasswordField && (
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+            >
+              {showPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
+            </button>
+          )}
+        </div>
       )}
-      {isPasswordField && (
-        <span className="password-eye-icon" onClick={handleTogglePassword}>
-          {showPassword ? <Visibility /> : <VisibilityOff />}
-        </span>
-      )}
-      {error && <p className="error">{error}</p>}
-    </>
+
+      {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+    </div>
   );
 };
+
 export default InputField;

@@ -1,16 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import Form from 'react-bootstrap/Form';
-import { Select, Spin } from 'antd';
-import { Info } from '@mui/icons-material';
+import React from 'react';
+import { InfoOutlined } from '@mui/icons-material';
 import { Tooltip } from 'antd';
 
-interface CustomChangeSelectEvent<T> {
+export interface CustomChangeSelectEvent<T> {
   value: T;
   name: string;
   type: string;
-  dataset?: {
-    [key: string]: any | undefined; // Index signature for optional key-value pairs
-  };
+  dataset?: { [key: string]: any };
 }
 
 export type CustomSelectChangeEvent = CustomChangeSelectEvent<string>;
@@ -18,27 +14,20 @@ export type CustomSelectChangeEvent = CustomChangeSelectEvent<string>;
 interface SelectFieldProps {
   label: string;
   name: string;
-  options?: Array<{ value: string | number | boolean; label: string }>; // Define the type for options array
-  value: string; // Define the type for data object
-  onChangeInput: (e: React.ChangeEvent<CustomSelectChangeEvent>) => void; // Define the type for onChangeInput function
+  options?: Array<{ value: string | number | boolean; label: string }>;
+  value: string;
+  onChangeInput: (e: React.ChangeEvent<CustomSelectChangeEvent>) => void;
   style?: React.CSSProperties;
   error?: string;
   disabled?: boolean;
-  selectEmpty?: boolean;
   required?: boolean;
   tooltipTitle?: string;
   placeholder?: string;
-  showSearch?: boolean;
-  onSearch?: (search: string) => void;
-  onClear?: () => void;
   onBlur?: (e: React.ChangeEvent<CustomSelectChangeEvent>) => void;
-  loading?: boolean;
   className?: string;
-  mode?: 'multiple' | 'tags';
-  selectCustomButton?: React.ReactNode;
 }
 
-const SelectField = ({
+const SelectField: React.FC<SelectFieldProps> = ({
   label,
   name,
   options = [],
@@ -46,93 +35,63 @@ const SelectField = ({
   onChangeInput,
   style,
   error,
-  selectEmpty,
-  tooltipTitle,
-  showSearch,
-  onSearch,
+  disabled = false,
   required = false,
+  tooltipTitle,
   onBlur,
-  loading,
   className = '',
-  mode = undefined,
-  selectCustomButton,
-  ...props
-}: SelectFieldProps) => {
-  const [search, setSearch] = useState<string>('');
-  const [open, setOpen] = useState<boolean>(false);
-
-  useEffect(() => {
-    onSearch && onSearch(search);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search]);
-
-  const onDropdownVisibleChange = (open: boolean) => {
-    setOpen(open);
-  };
-
-  const handleInputChange = (value: any) => {
+  placeholder = 'Select an option',
+}) => {
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const target = {
-      value: value,
-      name: name,
+      value: e.target.value,
+      name,
       type: 'select',
-      dataset: { label: label, strict: true, required: required },
+      dataset: { label, strict: true, required },
     } as CustomSelectChangeEvent;
+
     const event = {
-      target: target,
+      target,
     } as React.ChangeEvent<CustomSelectChangeEvent>;
+
     onChangeInput(event);
   };
 
-  const renderDropDown = (menu: React.ReactElement) => {
-    if (selectCustomButton) {
-      // Cloning and adding a new prop
-      return (
-        <>
-          {menu}
-          <div onClick={() => setOpen(false)}>{selectCustomButton}</div>
-        </>
-      );
-    }
-    return menu;
-  };
-
-  const validValue = options.some((option) => option.value === value) ? value : undefined;
-
   return (
-    <Form.Group className={`mb-3 group-relative ${className}`}>
-      <Form.Label style={style}>
+    <div className={`mb-4 w-full ${className}`}>
+      <label className="block mb-1 text-sm font-medium text-gray-700" style={style}>
         {label}
-        {required && <span className="required">* </span>}
+        {required && <span className="text-red-500"> *</span>}
         {tooltipTitle && (
-          <Tooltip placement="top" title={tooltipTitle} trigger={'hover'}>
-            <Info fontSize="small" className="cursor-pointer" />
+          <Tooltip title={tooltipTitle}>
+            <InfoOutlined className="ml-1 inline-block text-gray-400 cursor-pointer" />
           </Tooltip>
         )}
-      </Form.Label>
-      <Select
-        mode={mode}
-        open={open}
-        onDropdownVisibleChange={onDropdownVisibleChange}
-        value={mode ? value : validValue}
-        showSearch={showSearch}
-        searchValue={search}
-        onSearch={showSearch ? setSearch : undefined}
-        onChange={handleInputChange}
-        options={options}
-        dropdownRender={renderDropDown}
-        className="antd-select"
-        onClear={() => {
-          setSearch('');
-          handleInputChange(null);
-        }}
-        filterOption={false}
-        autoClearSearchValue
-        allowClear={selectEmpty}
-        notFoundContent={loading ? <Spin size="small" /> : undefined}
-        {...props}
-      />
-      {error && <p className="error">{error}</p>}
-    </Form.Group>
+      </label>
+
+      <select
+        id={name}
+        name={name}
+        value={value}
+        onChange={handleChange}
+        onBlur={onBlur}
+        disabled={disabled}
+        className={`w-full px-3 py-2 border text-sm rounded-md focus:outline-none 
+          ${error ? 'border-red-500' : 'border-gray-300'} 
+          focus:ring-2 focus:ring-blue-500 bg-white`}
+      >
+        <option value="" disabled>
+          {placeholder}
+        </option>
+        {options.map((opt) => (
+          <option key={opt.value.toString()} value={opt.value.toString()}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
+
+      {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+    </div>
   );
 };
 

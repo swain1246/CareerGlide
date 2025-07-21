@@ -1,37 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, KeyboardEvent } from 'react';
 import InputField, { CustomSelectDateEvent } from '@src/components/input/InputField';
 import SelectField, { CustomSelectChangeEvent } from '@src/components/input/SelectField';
 import type { GlobalInputFieldType } from '@src/components/input/GlobalInput';
-import { Form } from 'antd';
-import { Button } from 'react-bootstrap';
 import { validateFieldError } from '@src/helper/validations/custom';
-import Link from 'next/link';
 import { APP_ROUTE } from '@src/constants';
 import { ValidateInputValue } from '@src/helper/common';
 import { AuthResendOTP } from './AuthResendOtp';
 import { KeyPairInterface } from '@src/redux/interfaces';
+import Link from 'next/link';
 
-/**
- * Props for AuthFormInput component
- */
 type AuthFormInputProps = {
-  state: KeyPairInterface; // State containing input field values
-  setState: React.Dispatch<React.SetStateAction<KeyPairInterface>>; // Function to update state
-  fields: GlobalInputFieldType[]; // Input fields configuration
-  onSubmit: () => void; // Function to handle form submission
-  onResend?: () => void; // Function to resend OTP
-  buttonTitle: string; // Title for the submit button
-  formType?: 'candidate' | 'admin'; // Title for the submit button
-  loginLink?: boolean; // Whether to show the login link
-  signUpLink?: boolean; // Whether to show the sign up link
-  forgotPasswordLink?: boolean; // Whether to show the forgot password link
-  acceptTerms?: boolean; // Whether to show the terms acceptance checkbox
-  rememberMe?: boolean; // Whether to show the remember me checkbox
+  state: KeyPairInterface;
+  setState: React.Dispatch<React.SetStateAction<KeyPairInterface>>;
+  fields: GlobalInputFieldType[];
+  onSubmit: () => void;
+  onResend?: () => void;
+  buttonTitle: string;
+  formType?: 'candidate' | 'admin';
+  loginLink?: boolean;
+  signUpLink?: boolean;
+  forgotPasswordLink?: boolean;
+  acceptTerms?: boolean;
+  rememberMe?: boolean;
 };
 
-/**
- * AuthFormInput component for rendering authentication form
- */
 export const AuthFormInput: React.FC<AuthFormInputProps> = ({
   setState,
   fields,
@@ -44,158 +36,211 @@ export const AuthFormInput: React.FC<AuthFormInputProps> = ({
   forgotPasswordLink = false,
   acceptTerms = false,
   rememberMe = false,
-  formType = 'admin',
 }) => {
   const [error, setError] = useState<KeyPairInterface>({});
   const [accepted, setAccepted] = useState<boolean>(false);
+  const [remember, setRemember] = useState<boolean>(false);
 
-  // Function to handle input change event
-  const handleInputChangeEvent = async (
-    e: React.ChangeEvent<HTMLInputElement | CustomSelectChangeEvent | CustomSelectDateEvent>,
+  const handleInputChangeEvent = (
+    e: HTMLInputElement | HTMLTextAreaElement | CustomSelectChangeEvent | CustomSelectDateEvent,
   ) => {
     const { error, key, value, changable } = ValidateInputValue(e);
     if (changable) {
-      setState((prev: KeyPairInterface) => ({ ...prev, [key]: value }));
+      setState((prev) => ({ ...prev, [key]: value }));
     }
-    setError((prev: KeyPairInterface) => ({ ...prev, [key]: error }));
+    setError((prev) => ({ ...prev, [key]: error }));
   };
 
-  // Function to handle key down event
-  const handleKeyDownEvent = async (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' || e.key === 'enter') {
+  const handleKeyDownEvent = (e: KeyboardEvent<HTMLElement | HTMLTextAreaElement>) => {
+    if (e.key.toLowerCase() === 'enter') {
       e.preventDefault();
-      handleSubmit(e);
+      handleSubmit();
     }
   };
 
-  // Function to handle form submission
-  const handleSubmit = (e: any) => {
+  const handleSubmit = () => {
     const isValid = validate();
     if (isValid) {
       onSubmit();
     }
   };
 
-  // Function to handle terms acceptance
   const handleAccepted = () => {
     setAccepted(!accepted);
-    setError((prev: KeyPairInterface) => ({ ...prev, accepted: '' }));
+    setError((prev) => ({ ...prev, accepted: '' }));
   };
 
-  // Function to validate form fields
   const validate = () => {
     let isValid = true;
-    fields.forEach((field: GlobalInputFieldType) => {
+    fields.forEach((field) => {
       const value: string = state[field.name] ?? '';
-      const error = validateFieldError({ ...field, value });
-      if (error) {
-        setError((prev) => ({ ...prev, [field.name]: error.errorMsg }));
-        if (error.errorMsg.length) {
-          isValid = false;
-        }
+      const err = validateFieldError({ ...field, value });
+      if (err?.errorMsg) {
+        setError((prev) => ({ ...prev, [field.name]: err.errorMsg }));
+        isValid = false;
       }
       if (field.name === 'confirm_password') {
-        const password: string = state['password'] ?? '';
-        if (password !== value) {
+        if ((state['password'] ?? '') !== value) {
           setError((prev) => ({
             ...prev,
-            [field.name]: 'Confirm Password does not match.',
-          }));
-          isValid = false;
-        }
-      }
-      if (acceptTerms) {
-        if (!accepted) {
-          setError((prev) => ({
-            ...prev,
-            accepted: 'Please accept the terms of use and privacy policy.',
+            confirm_password: 'Confirm Password does not match.',
           }));
           isValid = false;
         }
       }
     });
+
+    if (acceptTerms && !accepted) {
+      setError((prev) => ({
+        ...prev,
+        accepted: 'Please accept the terms of use and privacy policy.',
+      }));
+      isValid = false;
+    }
+
     return isValid;
   };
 
   return (
-    <>
-      <Form>
-        {fields.map((field: GlobalInputFieldType, index: number) => {
-          const InputComponent = field.type == 'select' ? SelectField : InputField;
+    <form onSubmit={(e) => e.preventDefault()} className="w-full max-w-md mx-auto space-y-6">
+      {/* Form Fields */}
+      <div className="space-y-5">
+        {fields.map((field, index) => {
+          const InputComponent = field.type === 'select' ? SelectField : InputField;
           return (
-            <InputComponent
-              key={index}
-              placeholder={
-                field.placeholder ?? (field.type == 'date' ? field.label : `Enter ${field.label}`)
-              }
-              value={state[field.name]}
-              error={error[field.name]}
-              onChangeInput={handleInputChangeEvent}
-              onKeyDown={handleKeyDownEvent}
-              {...field}
-            />
+            <div key={index} className="space-y-1">
+              <InputComponent
+                placeholder={
+                  field.placeholder ??
+                  (field.type === 'date' ? field.label : `Enter ${field.label}`)
+                }
+                value={state[field.name]}
+                error={error[field.name]}
+                onChangeInput={handleInputChangeEvent}
+                onKeyDown={handleKeyDownEvent}
+                {...field}
+              />
+            </div>
           );
         })}
+      </div>
 
-        {onResend && <AuthResendOTP onResend={onResend} />}
+      {/* OTP Resend */}
+      {onResend && <AuthResendOTP onResend={onResend} />}
 
-        {acceptTerms && (
-          <div className="mb-3 group-relative">
-            <div className="same-line-privacy">
-              <input type="checkbox" id="accept" checked={accepted} onChange={handleAccepted} />
-              <label htmlFor="accept" className="ml-1">
-                I accept the{' '}
-                <a href={APP_ROUTE.TERMS_AND_CONDITION} target="_blank">
-                  terms of use
-                </a>{' '}
-                and the{' '}
-                <a href={APP_ROUTE.PRIVACY_POLICY} target="_blank">
-                  privacy policy
-                </a>
-                .
-              </label>
-            </div>
-            {error.accepted && <p style={{ color: 'red' }}>{error.accepted}</p>}
+      {/* Terms & Conditions */}
+      {acceptTerms && (
+        <div className="relative flex items-start pt-1">
+          <div className="flex items-center h-5">
+            <input
+              id="terms"
+              name="terms"
+              type="checkbox"
+              checked={accepted}
+              onChange={handleAccepted}
+              className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+            />
           </div>
-        )}
-
-        {rememberMe && (
-          <div className="mb-3 group-relative">
-            <div className="same-line-privacy">
-              <input type="checkbox" id="remeberMe" />
-              <label htmlFor="remeberMe" className="ml-1">
-                Remember Me
-              </label>
-            </div>
+          <div className="ml-3 text-sm">
+            <label htmlFor="terms" className="text-gray-700">
+              I accept the{' '}
+              <Link
+                href={APP_ROUTE.TERMS_AND_CONDITION}
+                className="font-medium text-indigo-600 hover:text-indigo-500"
+              >
+                terms of use
+              </Link>{' '}
+              and{' '}
+              <Link
+                href={APP_ROUTE.PRIVACY_POLICY}
+                className="font-medium text-indigo-600 hover:text-indigo-500"
+              >
+                privacy policy
+              </Link>
+            </label>
+            {error.accepted && <p className="mt-1 text-sm text-red-600">{error.accepted}</p>}
           </div>
-        )}
+        </div>
+      )}
 
-        <Button className="btn btn-theme" onClick={handleSubmit}>
+      {/* Remember Me */}
+      {rememberMe && (
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <input
+              id="remember-me"
+              name="remember-me"
+              type="checkbox"
+              checked={remember}
+              onChange={() => setRemember(!remember)}
+              className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+            />
+            <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+              Remember me
+            </label>
+          </div>
+
+          {forgotPasswordLink && (
+            <div className="text-sm">
+              <Link
+                href={APP_ROUTE.FORGOT_PASSWORD}
+                className="font-medium text-indigo-600 hover:text-indigo-500"
+              >
+                Forgot password?
+              </Link>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Submit Button */}
+      <div>
+        <button
+          type="submit"
+          onClick={handleSubmit}
+          className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200"
+        >
           {buttonTitle}
-        </Button>
-      </Form>
+        </button>
+      </div>
 
-      {loginLink && (
-        <div className="bottom-text">
-          <span>
-            Already have an account? <Link href={APP_ROUTE.LOGIN}>Sign In</Link>
-          </span>
-        </div>
-      )}
-      {signUpLink && (
-        <div className="bottom-text">
-          <span>
-            Dont have an account? <Link href={APP_ROUTE.REGISTER}>Sign Up Now</Link>
-          </span>
-        </div>
-      )}
-      {forgotPasswordLink && (
-        <div className="bottom-text">
-          <span>
-            <Link href={APP_ROUTE.FORGOT_PASSWORD}>Forgot password?</Link>
-          </span>
-        </div>
-      )}
-    </>
+      {/* Footer Links */}
+      <div className="text-center text-sm space-y-3 pt-2">
+        {loginLink && (
+          <p className="text-gray-600">
+            Already have an account?{' '}
+            <Link
+              href={APP_ROUTE.LOGIN}
+              className="font-medium text-indigo-600 hover:text-indigo-500"
+            >
+              Sign In
+            </Link>
+          </p>
+        )}
+
+        {signUpLink && (
+          <p className="text-gray-600">
+            Don’t have an account?{' '}
+            <Link
+              href={APP_ROUTE.REGISTER}
+              className="font-medium text-indigo-600 hover:text-indigo-500"
+            >
+              Sign Up Now
+            </Link>
+          </p>
+        )}
+
+        {!rememberMe && forgotPasswordLink && (
+          <p className="text-gray-600">
+            <Link
+              href={APP_ROUTE.FORGOT_PASSWORD}
+              className="font-medium text-indigo-600 hover:text-indigo-500"
+            >
+              Forgot password?
+            </Link>
+          </p>
+        )}
+      </div>
+    </form>
   );
 };

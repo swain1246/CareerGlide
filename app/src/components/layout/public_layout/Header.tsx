@@ -3,12 +3,13 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { LogOut, Settings, Menu, X, Briefcase, User as UserIcon } from 'lucide-react';
+import { LogOut, Settings, Menu, X, Briefcase, User as UserIcon, ChevronDown } from 'lucide-react';
 
 export const Header = () => {
   const router = useRouter();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const isActive = (path: string) => router.pathname === path;
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user] = useState({
@@ -62,20 +63,88 @@ export const Header = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-6">
-            {navLinks.map(({ href, label }) => {
-              const isActive = router.asPath === href;
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  className={`text-gray-700 font-medium transition ${isActive ? 'text-blue-600' : 'hover:text-blue-600'
-                    }`}
-                >
-                  {label}
-                </Link>
-              );
-            })}
+          <div className="hidden md:flex items-center space-x-8">
+            {/* Home */}
+            <Link
+              href="/"
+              className={`font-medium transition-colors ${
+                isActive('/') ? 'text-blue-600' : 'text-gray-800 hover:text-blue-600'
+              }`}
+            >
+              Home
+            </Link>
+
+            {/* For Students Dropdown */}
+            <div className="relative group">
+              <button className="flex items-center font-medium text-gray-800 hover:text-blue-600 transition-colors cursor-pointer">
+                For Students
+                <ChevronDown className="w-4 h-4 ml-1" />
+              </button>
+
+              <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 ">
+                <div className="py-2">
+                  <Link
+                    href="/student/register"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                  >
+                    Student Registration
+                  </Link>
+                  <Link
+                    href="/jobs"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                  >
+                    Browse Jobs
+                  </Link>
+                  <Link
+                    href="/mentors"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                  >
+                    Find Mentors
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* For Companies Dropdown */}
+            <div className="relative group">
+              <button className="flex items-center font-medium text-gray-800 hover:text-blue-600 transition-colors cursor-pointer">
+                For Companies
+                <ChevronDown className="w-4 h-4 ml-1" />
+              </button>
+
+              <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                <div className="py-2">
+                  <Link
+                    href="/company/register"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                  >
+                    Company Registration
+                  </Link>
+                  <Link
+                    href="/company/post-job"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                  >
+                    Post Jobs
+                  </Link>
+                  <Link
+                    href="/company/talent"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                  >
+                    Browse Talent
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* Mentors */}
+            <Link
+              href="/mentors"
+              className={`font-medium transition-colors ${
+                isActive('/mentors') ? 'text-blue-600' : 'text-gray-800 hover:text-blue-600'
+              }`}
+            >
+              Mentors
+            </Link>
           </div>
 
           {/* Right Side: Auth or Profile */}
@@ -127,13 +196,13 @@ export const Header = () => {
             ) : (
               <>
                 <Link
-                  href="/login"
+                  href="/auth/login"
                   className="text-sm font-medium text-gray-700 hover:text-blue-600 transition"
                 >
                   Login
                 </Link>
                 <Link
-                  href="/register"
+                  href="/auth/register"
                   className="px-4 py-2 bg-gradient-to-br from-blue-600 to-purple-600 text-white rounded-md text-sm font-medium hover:opacity-90 transition"
                 >
                   Get Started
@@ -162,8 +231,9 @@ export const Header = () => {
                   <Link
                     key={href}
                     href={href}
-                    className={`px-3 py-2 rounded-md text-sm font-medium transition ${isActive ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'
-                      }`}
+                    className={`px-3 py-2 rounded-md text-sm font-medium transition ${
+                      isActive ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'
+                    }`}
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {label}

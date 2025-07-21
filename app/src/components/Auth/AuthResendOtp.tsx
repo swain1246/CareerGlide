@@ -1,66 +1,54 @@
 import React, { useState, useEffect } from 'react';
 
-/**
- * Props for AuthResendOTP component
- */
 type AuthResendOTPProps = {
-  /**
-   * Function to handle OTP resend
-   */
   onResend: Function;
 };
 
-/**
- * AuthResendOTP component for handling OTP resend functionality
- */
 export const AuthResendOTP: React.FC<AuthResendOTPProps> = ({ onResend }) => {
   const [seconds, setSeconds] = useState(0);
 
   useEffect(() => {
     let timerId: NodeJS.Timeout;
-
-    // Start the timer when component mounts
     if (seconds > 0) {
       timerId = setInterval(() => {
-        setSeconds((prevSeconds) => prevSeconds - 1);
+        setSeconds((prev) => prev - 1);
       }, 1000);
     }
-
-    // Clear the timer when component unmounts or when seconds reach 0
-    return () => {
-      clearInterval(timerId);
-    };
+    return () => clearInterval(timerId);
   }, [seconds]);
 
-  /**
-   * Function to handle OTP resend
-   */
   const handleResend = async () => {
     if (seconds === 0) {
-      const resend = await onResend();
-      if (resend) {
-        setSeconds(60);
+      const success = await onResend();
+      if (success) {
+        setSeconds(60); // restart timer
       }
     }
   };
 
   return (
-    <>
-      <div className="resend-otp-div">
+    <div className="mt-4 flex flex-col items-center space-y-2 text-sm text-gray-700">
+      {seconds > 0 ? (
         <div>
-          {seconds > 0 && (
-            <>
-              Time Remaining: <strong>{seconds} seconds</strong>
-            </>
-          )}
+          ⏳ Time Remaining: <span className="font-semibold">{seconds}s</span>
         </div>
+      ) : (
+        <div className="h-5" /> // maintain spacing
+      )}
 
-        <div>
-          <span onClick={handleResend} className={seconds > 0 ? 'disabled' : ''}>
-            Resend Otp
-          </span>
-        </div>
-      </div>
-    </>
+      <button
+        onClick={handleResend}
+        disabled={seconds > 0}
+        className={`px-4 py-1 rounded border 
+          ${
+            seconds > 0
+              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              : 'bg-blue-600 text-white hover:bg-blue-700'
+          } 
+        transition duration-200`}
+      >
+        Resend OTP
+      </button>
+    </div>
   );
 };

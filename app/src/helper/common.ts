@@ -28,10 +28,10 @@ type ValidateInputValue = {
   trim: boolean;
   index: number | undefined;
 };
-
-// Function to validate input value based on event target properties
 export const ValidateInputValue = (
-  event: React.ChangeEvent<HTMLInputElement | CustomSelectChangeEvent | CustomSelectDateEvent>,
+  event: React.ChangeEvent<
+    HTMLInputElement | HTMLTextAreaElement | CustomSelectChangeEvent | CustomSelectDateEvent
+  >,
   eventType: string = 'change',
 ): ValidateInputValue => {
   let booleanType: boolean = false;
