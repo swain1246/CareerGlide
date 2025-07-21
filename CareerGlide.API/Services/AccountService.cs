@@ -16,6 +16,10 @@ namespace CareerGlide.API.Services
             this._sendEmailAPIService = sendEmailAPIService;
         }
 
+        // ---------
+        // Student Registration
+        // ---------
+
         public async Task<ApiResponse<PostRegisterEntity>> StudentRegister(StudentRegisterEntity entity)
         {
             try
@@ -37,7 +41,7 @@ namespace CareerGlide.API.Services
                 var result = await _genericRepository.GetAsync<PostRegisterEntity>("StudentRegistration", parameters);
                 if (result.IsSuccess == -1)
                 {
-                    return new ApiResponse<PostRegisterEntity>(null, "Email Already Exists", false);
+                    return new ApiResponse<PostRegisterEntity>(null, "Email Already Exists", false,404);
                 }
                 else if (result.IsSuccess == 1)
                 {
@@ -45,37 +49,90 @@ namespace CareerGlide.API.Services
                 }
                 else
                 {
-                    return new ApiResponse<PostRegisterEntity>(null, "User Creation Failed", false);
+                    return new ApiResponse<PostRegisterEntity>(null, "User Creation Failed", false,404);
                 }
 
             }
             catch (Exception ex)
             {
-                return new ApiResponse<PostRegisterEntity>(null, $"Error registering student: {ex.Message}", false);
+                return new ApiResponse<PostRegisterEntity>(null, $"Error registering student: {ex.Message}", false,500);
             }
         }
 
-        public async Task<ApiResponse<LoginEntity>> CheckLogin(LoginEntity entity)
+        // ---------
+        // Company Registration
+        // ---------
+
+        public async Task<ApiResponse<PostRegisterEntity>> CompanyRegister(CompanyRegistationEntity entity)
         {
             try
             {
                 var parameters = new SqlParameter[]
                 {
-                    new SqlParameter("@Email", SqlDbType.Text) { Value = entity.Email },
+                    new SqlParameter("@UserType", SqlDbType.Int) { Value = entity.UserType },
+                    new SqlParameter("@Email", SqlDbType.Text) { Value = entity.LoginEmail },
                     new SqlParameter("@Password", SqlDbType.Text) { Value = entity.Password },
+                    new SqlParameter("@CompanyName", SqlDbType.Text) { Value = entity.CompanyName },
+                    new SqlParameter("@ContactPersonName", SqlDbType.Text) { Value = entity.ContactPersonName },
+                    new SqlParameter("@ContactPersonDesignation", SqlDbType.Text) { Value = entity.ContactPersionDesignation },
+                    new SqlParameter("@SupportEmail", SqlDbType.Text) { Value = entity.SupportEmail },
+                    new SqlParameter("@PhoneNumber", SqlDbType.Text) { Value = entity.PhoneNumber },
+                    new SqlParameter("@Gstin", SqlDbType.Text) { Value = entity.GstIn },
+                    new SqlParameter("@PanNumber", SqlDbType.Text) { Value = entity.PanNumber },
+                    new SqlParameter("@WebsiteUrl", SqlDbType.Text) { Value = entity.Website },
+                    new SqlParameter("@LinkedinUrl", SqlDbType.Text) { Value = entity.LinkedinUrl },
+                    new SqlParameter("@Industry", SqlDbType.Text) { Value = entity.Industry },
+                    new SqlParameter("@Location", SqlDbType.Text) { Value = entity.Location },
+                };
+
+                var result = await _genericRepository.GetAsync<PostRegisterEntity>("EmployeerRegistration", parameters);
+                if (result.IsSuccess == -1)
+                {
+                    return new ApiResponse<PostRegisterEntity>(null, "Email Already Exists", false, 404);
+                }
+                else if (result.IsSuccess == 1)
+                {
+                    return new ApiResponse<PostRegisterEntity>(result, "User Created Successfully", true);
+                }
+                else
+                {
+                    return new ApiResponse<PostRegisterEntity>(null, "User Creation Failed", false, 404);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<PostRegisterEntity>(null, $"Error registering Company: {ex.Message}", false, 500);
+            }
+        }
+
+        // ---------
+        // Check User Login
+        // ---------
+
+        public async Task<ApiResponse<LoginEntity>> CheckLogin(string Email, string Password)
+        {
+            try
+            {
+                var parameters = new SqlParameter[]
+                {
+                    new SqlParameter("@Email", SqlDbType.Text) { Value = Email },
+                    new SqlParameter("@Password", SqlDbType.Text) { Value = Password },
                 };
 
                 var result = await _genericRepository.GetAsync<LoginEntity> ("CheckUserLogIn", parameters);
 
                     return new ApiResponse<LoginEntity>(result, "User LogIn Data", true);
-
-
             }
             catch (Exception ex)
             {
-                return new ApiResponse<LoginEntity>(null, $"Error Login : {ex.Message}", false);
+                return new ApiResponse<LoginEntity>(null, $"Error Login : {ex.Message}", false,500);
             }
         }
+
+        // ---------
+        // Send Regitration OTP Verification Mail
+        // ---------
 
         public async Task<ApiResponse<string>> SendOTPVerifyMail(string Email)
         {
@@ -93,9 +150,13 @@ namespace CareerGlide.API.Services
             }
             catch (Exception ex)
             {
-                return new ApiResponse<string>(null, $"Error Sending Mail : {ex.Message}", false);
+                return new ApiResponse<string>(null, $"Error Sending Mail : {ex.Message}", false,500);
             }
         }
+
+        // ---------
+        // Verify OTP for Registration
+        // ---------
 
         public async Task<ApiResponse<string>> VerifyRegisterMail(string Email, int OTP)
         {
@@ -113,16 +174,107 @@ namespace CareerGlide.API.Services
                     return new ApiResponse<string>(null,"OTP Verified...",true);
                 }else if (result.IsSuccess == -1)
                 {
-                    return new ApiResponse<string>(null,result.Message,false);
+                    return new ApiResponse<string>(null,result.Message,false, 404);
                 }
                 else
                 {
-                    return new ApiResponse<string>(null,"Somthing went Wrong", false);
+                    return new ApiResponse<string>(null,"Somthing went Wrong", false, 404);
                 }
             }
             catch (Exception ex)
             {
-                return new ApiResponse<string>(null, $"Error While Verify OTP: {ex.Message}", false);
+                return new ApiResponse<string>(null, $"Error While Verify OTP: {ex.Message}", false, 500);
+            }
+        }
+
+        // ---------
+        // Send Forgot Password OTP Verification Mail
+        // ---------
+
+        public async Task<ApiResponse<string>> SendForgotPassOTPVerifyMail(string Email)
+        {
+            try
+            {
+                var parameters = new SqlParameter[]
+                {
+                    new SqlParameter("@Email", SqlDbType.Text) { Value = Email },
+                };
+
+                var result = await _genericRepository.GetAsync<EmailEntity>("SendMailForForgotPassword", parameters);
+                if (result.StatusCode == 200)
+                {
+                    await _sendEmailAPIService.SendEmail(result);
+                    return new ApiResponse<string>("Mail Sent sccessfully.");
+                }
+                else
+                {
+                    return new ApiResponse<string>(null,result.Message,false,result.StatusCode);
+                }
+                
+
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<string>(null, $"Error Sending Mail : {ex.Message}", false,500);
+            }
+        }
+
+        // ---------
+        // Verify OTP for Forgot Password
+        // ---------
+
+        public async Task<ApiResponse<string>> VerifyForgotPasswordOTP(string Email, int OTP)
+        {
+            try
+            {
+                var parameters = new SqlParameter[]
+                {
+                    new SqlParameter("@Email", SqlDbType.Text) { Value = Email },
+                    new SqlParameter("@OTP", SqlDbType.Text) { Value = OTP },
+                };
+
+                var result = await _genericRepository.GetAsync<dynamic>("VerifyOTPForForgotPassword", parameters);
+                if (result.IsSuccess == 1)
+                {
+                    return new ApiResponse<string>(null, "OTP Verified...", true);
+                }
+                else if (result.IsSuccess == -1)
+                {
+                    return new ApiResponse<string>(null, result.Message, false,404);
+                }
+                else
+                {
+                    return new ApiResponse<string>(null, "Somthing went Wrong", false,404);
+                }
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<string>(null, $"Error While Verify OTP: {ex.Message}", false,500);
+            }
+        }
+
+
+        //-------------
+        //Reset Password
+        //--------------
+
+        public async Task<ApiResponse<string>> ResetPassword(string Email,string Password)
+        {
+            try
+            {
+                var parameters = new SqlParameter[]
+                {
+                    new SqlParameter("@Email", SqlDbType.Text) { Value = Email },
+                    new SqlParameter("@NewPassword", SqlDbType.Text) { Value = Password },
+                };
+
+                var result = await _genericRepository.ExecuteAsync("ForgotPassword", parameters);
+
+                return new ApiResponse<string>(null, "Password Reset Successfully", true);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<string>(null, $"Error while reseting Password : {ex.Message}", false, 500);
             }
         }
     }

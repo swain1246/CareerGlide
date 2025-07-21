@@ -1,4 +1,5 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using System.ComponentModel.DataAnnotations;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using CareerGlide.API.Entity;
@@ -50,10 +51,51 @@ namespace CareerGlide.API.Controllers
             }
         }
 
+        [HttpPost("CompanyRegistration")]
+
+        public async Task<IActionResult> CompanyRegistration([FromBody] CompanyRegistationEntity entity)
+        {
+            if (entity == null)
+            {
+                return BadRequest(new { Message = "Invalid registration data." });
+            }
+            try
+            {
+                var response = await _accountService.CompanyRegister(entity);
+                if (response.Success)
+                {
+                    var mailResponse = await _accountService.SendOTPVerifyMail(entity.LoginEmail);
+
+                    return Ok(response);
+                }
+                else
+                {
+                    return BadRequest(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = $"Error registering Company: {ex.Message}" });
+            }
+        }
+
 
         [HttpPost("resend-otp")]
-        public async Task<IActionResult> ReSendOTP(string Email)
+        public async Task<IActionResult> ReSendOTP([FromQuery, Required(ErrorMessage = "Email is required.")]
+                                           [EmailAddress(ErrorMessage = "Invalid email format.")]
+                                           string Email)
         {
+            //if (!ModelState.IsValid)
+            //{
+            //    var errors = ModelState
+            //        .Where(kvp => kvp.Value.Errors.Count > 0)
+            //        .ToDictionary(
+            //            kvp => kvp.Key,
+            //            kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+            //        );
+
+            //    return BadRequest(new ApiResponse<object>(errors, "Validation Failed", false));
+            //}
             var responce = await _accountService.SendOTPVerifyMail(Email);
             if (responce.Success)
             {
@@ -66,8 +108,11 @@ namespace CareerGlide.API.Controllers
 
 
         [HttpPost("Verify-register-otp")]
-        public async Task<IActionResult> VerifyRegisterOTP(string Email, int OTP)
+        public async Task<IActionResult> VerifyRegisterOTP([FromQuery, Required(ErrorMessage = "Email is required.")]
+                                           [EmailAddress(ErrorMessage = "Invalid email format.")]
+                                           string Email, [FromQuery, Required(ErrorMessage = "OTP is required.")] int OTP)
         {
+
             var Response = await _accountService.VerifyRegisterMail(Email, OTP);
 
                 return Ok(Response);
@@ -76,14 +121,21 @@ namespace CareerGlide.API.Controllers
 
 
         [HttpPost("Login")]
-        public async Task<IActionResult> CheckLogin([FromBody] LoginEntity entity)
+        public async Task<IActionResult> CheckLogin([FromQuery, Required(ErrorMessage = "Email is required.")]
+                                           [EmailAddress(ErrorMessage = "Invalid email format.")]
+                                           string Email, [FromQuery, Required(ErrorMessage = "Password is required.")] string Password)
         {
-            if (entity == null)
+
+            // Validate Password
+            var passwordErrors = ValidationHelper.ValidatePassword(Password).ToList();
+            if (passwordErrors.Any())
             {
-                return BadRequest(new { Message = "Invalid login data." });
+                // Combine all password validation errors into a single message
+                var combinedErrors = string.Join(" | ", passwordErrors.Select(e => e.ErrorMessage));
+                return BadRequest(new ApiResponse<string>(null, combinedErrors, false));
             }
-            
-            var response = await _accountService.CheckLogin(entity);
+
+            var response = await _accountService.CheckLogin(Email,Password);
             if (response.Success)
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
@@ -91,7 +143,7 @@ namespace CareerGlide.API.Controllers
 
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
-                    Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, Convert.ToString(entity.Email)) }),
+                    Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, Convert.ToString(Email)) }),
                     Expires = DateTime.UtcNow.AddHours(1),
                     Issuer = _configuration["Jwt:Issuer"],
                     Audience = _configuration["Jwt:Audience"],
@@ -123,6 +175,101 @@ namespace CareerGlide.API.Controllers
                 Data = null
             });
 
+        }
+
+        //----------------
+        // Send Forgot Password Mail API
+        //----------------
+
+        [HttpPost("SendForgotPasswordMail")]
+        public async Task<IActionResult> SendForgotPasswordMail([FromQuery, Required(ErrorMessage = "Email is required.")]
+                                           [EmailAddress(ErrorMessage = "Invalid email format.")] string Email)
+        {
+            if (string.IsNullOrEmpty(Email))
+            {
+                return BadRequest(new { Message = "Email is required." });
+            }
+            try
+            {
+                var response = await _accountService.SendForgotPassOTPVerifyMail(Email);
+                if (response.Success)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    return BadRequest(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = $"Error sending forgot password mail: {ex.Message}" });
+            }
+        }
+
+        //----------------
+        // Verify Forgot Password OTP
+        //----------------
+
+        [HttpPost("VerifyForgotPasswordOTP")]
+
+        public async Task<IActionResult> VerifyForgotPasswordOTP([FromQuery, Required(ErrorMessage = "Email is required.")]
+                                           [EmailAddress(ErrorMessage = "Invalid email format.")] string Email, int OTP)
+        {
+            if (string.IsNullOrEmpty(Email) || OTP <= 0)
+            {
+                return BadRequest(new { Message = "Invalid email or OTP." });
+            }
+            try
+            {
+                var response = await _accountService.VerifyForgotPasswordOTP(Email, OTP);
+                if (response.Success)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    return BadRequest(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = $"Error verifying forgot password OTP: {ex.Message}" });
+            }
+        }
+
+        //---------------
+        // Reset Password
+        //---------------
+
+        [HttpPost("ResetPassword")]
+        public async Task<IActionResult> ResetPassword([FromQuery, Required(ErrorMessage = "Email is required.")]
+                                           [EmailAddress(ErrorMessage = "Invalid email format.")] string Email,
+                                            [FromQuery, Required(ErrorMessage = "Password is required.")] string NewPassword)
+        {
+            var passwordErrors = ValidationHelper.ValidatePassword(NewPassword).ToList();
+            if (passwordErrors.Any())
+            {
+                // Combine all password validation errors into a single message
+                var combinedErrors = string.Join(" | ", passwordErrors.Select(e => e.ErrorMessage));
+                return BadRequest(new ApiResponse<string>(null, combinedErrors, false));
+            }
+            try
+            {
+                var response = await _accountService.ResetPassword(Email, NewPassword);
+                if (response.Success)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    return BadRequest(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = $"Error resetting password: {ex.Message}" });
+            }
         }
     }
 }
