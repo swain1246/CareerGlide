@@ -35,13 +35,14 @@ namespace CareerGlide.API.Services
                     new SqlParameter("@Gender", SqlDbType.Text) { Value = entity.Gender },
                     new SqlParameter("@College", SqlDbType.Text) { Value = entity.College },
                     new SqlParameter("@Degree", SqlDbType.Text) { Value = entity.Degree },
+                    new SqlParameter("@RegistrationNo", SqlDbType.Text) { Value = entity.RegistrationNumber },
                     new SqlParameter("@YearOfPassing", SqlDbType.Int) { Value = entity.YearOfPassing },
                 };
 
                 var result = await _genericRepository.GetAsync<PostRegisterEntity>("StudentRegistration", parameters);
                 if (result.IsSuccess == -1)
                 {
-                    return new ApiResponse<PostRegisterEntity>(null, "Email Already Exists", false,404);
+                    return new ApiResponse<PostRegisterEntity>(null, result.Message, false,404);
                 }
                 else if (result.IsSuccess == 1)
                 {
@@ -56,6 +57,50 @@ namespace CareerGlide.API.Services
             catch (Exception ex)
             {
                 return new ApiResponse<PostRegisterEntity>(null, $"Error registering student: {ex.Message}", false,500);
+            }
+        }
+
+        // ---------
+        // Mentor Registration
+        // ---------
+
+        public async Task<ApiResponse<PostRegisterEntity>> MentorRegister(MentorRegisterEntity entity)
+        {
+            try
+            {
+                var parameters = new SqlParameter[]
+                {
+                    new SqlParameter("@UserType", SqlDbType.Int) { Value = entity.UserType },
+                    new SqlParameter("@Email", SqlDbType.Text) { Value = entity.Email },
+                    new SqlParameter("@Password", SqlDbType.Text) { Value = entity.Password },
+                    new SqlParameter("@FirstName", SqlDbType.Text) { Value = entity.FirstName },
+                    new SqlParameter("@LastName", SqlDbType.Text) { Value = entity.LastName },
+                    new SqlParameter("@PhoneNumber", SqlDbType.Text) { Value = entity.PhoneNumber },
+                    new SqlParameter("@Designation", SqlDbType.Text) { Value = entity.Designation },
+                    new SqlParameter("@CompanyName", SqlDbType.Text) { Value = entity.CompanyName },
+                    new SqlParameter("@ExperienceYears", SqlDbType.Int) { Value = entity.ExperienceYears },
+                    new SqlParameter("@Bio", SqlDbType.Text) { Value = entity.Bio },
+
+                };
+
+                var result = await _genericRepository.GetAsync<PostRegisterEntity>("MentorRegistration", parameters);
+                if (result.IsSuccess == -1)
+                {
+                    return new ApiResponse<PostRegisterEntity>(null, result.Message, false, 404);
+                }
+                else if (result.IsSuccess == 1)
+                {
+                    return new ApiResponse<PostRegisterEntity>(result, "User Created Successfully", true);
+                }
+                else
+                {
+                    return new ApiResponse<PostRegisterEntity>(null, "User Creation Failed", false, 404);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<PostRegisterEntity>(null, $"Error registering student: {ex.Message}", false, 500);
             }
         }
 
@@ -88,7 +133,7 @@ namespace CareerGlide.API.Services
                 var result = await _genericRepository.GetAsync<PostRegisterEntity>("EmployeerRegistration", parameters);
                 if (result.IsSuccess == -1)
                 {
-                    return new ApiResponse<PostRegisterEntity>(null, "Email Already Exists", false, 404);
+                    return new ApiResponse<PostRegisterEntity>(null, result.Message, false, 404);
                 }
                 else if (result.IsSuccess == 1)
                 {

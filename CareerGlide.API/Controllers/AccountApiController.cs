@@ -80,6 +80,35 @@ namespace CareerGlide.API.Controllers
         }
 
 
+        [HttpPost("MentorRegistration")]
+
+        public async Task<IActionResult> MentorRegistration([FromBody] MentorRegisterEntity entity)
+        {
+            if (entity == null)
+            {
+                return BadRequest(new { Message = "Invalid registration data." });
+            }
+            try
+            {
+                var response = await _accountService.MentorRegister(entity);
+                if (response.Success)
+                {
+                    var mailResponse = await _accountService.SendOTPVerifyMail(entity.Email);
+
+                    return Ok(response);
+                }
+                else
+                {
+                    return BadRequest(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = $"Error registering Company: {ex.Message}" });
+            }
+        }
+
+
         [HttpPost("resend-otp")]
         public async Task<IActionResult> ReSendOTP([FromQuery, Required(ErrorMessage = "Email is required.")]
                                            [EmailAddress(ErrorMessage = "Invalid email format.")]
