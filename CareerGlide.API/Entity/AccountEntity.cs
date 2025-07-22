@@ -20,6 +20,7 @@ namespace CareerGlide.API.Entity
         public string Gender { get; set; }
         public string College { get; set; }
         public string Degree { get; set; }
+        public string RegistrationNumber { get; set; }
         public int YearOfPassing { get; set; }
 
 
@@ -71,11 +72,42 @@ namespace CareerGlide.API.Entity
         }
     }
 
+    public class MentorRegisterEntity : IValidatableObject
+    {
+        public int UserType { get; set; }
+        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress(ErrorMessage = "Invalid email format")]
+        public string Email { get; set; }
+        [Required(ErrorMessage = "Password is required")]
+        public string Password { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string PhoneNumber { get; set; }
+        public string Designation { get; set; }
+        public string CompanyName { get; set; }
+        public int ExperienceYears { get; set; }
+        public string Bio { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+
+            foreach (var error in ValidationHelper.ValidatePassword(Password))
+                yield return error;
+
+            foreach (var error in ValidationHelper.ValidateName(FirstName, "FirstName"))
+                yield return error;
+
+            foreach (var error in ValidationHelper.ValidateName(LastName, "LastName"))
+                yield return error;
+        }
+    }
+
     public class PostRegisterEntity
     {
         public int UserId { get; set; }
         public string Email { get; set; }
         public int IsSuccess { get; set; }
+        public string Message { get; set; }
     }
 
     public class LoginEntity
@@ -84,6 +116,8 @@ namespace CareerGlide.API.Entity
         public string Email { get; set; }
         public string Password { get; set; }
         public string StudentName { get; set; }
+        public string MentorName { get; set; }
+        public string AdminName { get; set; }
         public string CompanyName { get; set; }
         public string? UserToken { get; set; }
         public int StatusCode { get; set; }
