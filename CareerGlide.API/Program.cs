@@ -40,16 +40,16 @@ public class Program
         services.AddSwaggerGen();
 
 
-        services.AddCors(options =>
-        {
-            options.AddPolicy("AllowAll", policy =>
-            {
-                policy.AllowAnyOrigin() // Update as needed ---WithOrigins("http://localhost:5173")
-                      .AllowAnyHeader()
-                      .AllowAnyMethod();
-                      //.AllowCredentials();
-            });
-        });
+        //services.AddCors(options =>
+        //{
+        //    options.AddPolicy("AllowAll", policy =>
+        //    {
+        //        policy.AllowAnyOrigin() // Update as needed ---WithOrigins("http://localhost:5173")
+        //              .AllowAnyHeader()
+        //              .AllowAnyMethod();
+        //              //.AllowCredentials();
+        //    });
+        //});
 
 
         // ?? Add Session & Cache
