@@ -44,10 +44,10 @@ public class Program
         {
             options.AddPolicy("AllowAll", policy =>
             {
-                policy.AllowAnyOrigin() // Update as needed ---WithOrigins("http://localhost:5173")
+                policy.WithOrigins("http://localhost:3000") // Update as needed ---WithOrigins("http://localhost:5173")
                       .AllowAnyHeader()
-                      .AllowAnyMethod();
-                //.AllowCredentials();
+                      .AllowAnyMethod()
+                      .AllowCredentials();
             });
         });
 
