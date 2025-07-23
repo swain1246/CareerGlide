@@ -39,6 +39,7 @@ namespace CareerGlide.API.Services
                 };
 
                 var result = await _genericRepository.GetAsync<PostRegisterEntity>("StudentRegistration", parameters);
+
                 if (result.IsSuccess == -1)
                 {
                     return new ApiResponse<PostRegisterEntity>(null, result.Message, false,404);
