@@ -1,4 +1,5 @@
-﻿using CareerGlide.API.Entity;
+﻿using System.Data;
+using CareerGlide.API.Entity;
 using CareerGlide.API.Repositories;
 using Dapper;
 using Microsoft.Data.SqlClient;
@@ -14,25 +15,96 @@ namespace CareerGlide.API.Services
             this._genericRepository = genericRepository;
         }
 
-        public async Task<ApiResponse<IEnumerable<UserEntity>>> GetUsersData()
+        /// <summary>
+        /// Update User Profile Image
+        /// </summary>
+        /// 
+
+        public async Task<ApiResponse<string>> UpdateUserProfileImage(int UserId, string ProfileImageUrl)
         {
             try
             {
-                var result = await _genericRepository.GetAllAsync<UserEntity>("GetUserList");
-
-                if (result == null || !result.Any())
+                var parameters = new SqlParameter[]
                 {
-                    return new ApiResponse<IEnumerable<UserEntity>>(null, "No users found.", false);
+                    new SqlParameter("@UserId", SqlDbType.Int){Value = UserId },
+                    new SqlParameter("@ProfileImageUrl", SqlDbType.Text){Value = ProfileImageUrl }
+                };
+
+                var result = await _genericRepository.GetAsync<dynamic>("UpdateUserProfilePicture", parameters);
+
+                if (result.IsSuccess == 1)
+                {
+                    return new ApiResponse<string>
+                    {
+                        Success = true,
+                        Message = "Profile image updated successfully.",
+                        Data = null,
+                        StatusCode = 200
+                    };
                 }
                 else
                 {
-                    return new ApiResponse<IEnumerable<UserEntity>>(result, "Users retrieved successfully.");
+                    return new ApiResponse<string>
+                    {
+                        Success = false,
+                        Message = "Failed to Update User Profile Image",
+                        StatusCode = 400
+                    };
                 }
-
             }
             catch (Exception ex)
             {
-                return new ApiResponse<IEnumerable<UserEntity>>(null, $"Error retrieving users: {ex.Message}", false);
+                return new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "An error occurred while updating the profile image: " + ex.Message,
+                    StatusCode = 500
+                };
+            }
+        }
+
+        /// <summary>
+        /// Delete User Profile Image
+        /// </summary>
+        /// 
+
+        public async Task<ApiResponse<string>> DeleteUserProfileImage(int UserId)
+        {
+            try
+            {
+                var parameters = new SqlParameter[]
+                {
+                    new SqlParameter("@UserId", SqlDbType.Int){Value = UserId }
+                };
+                var result = await _genericRepository.GetAsync<dynamic>("DeleteUserProfilePicture", parameters);
+                if (result.IsSuccess == 1)
+                {
+                    return new ApiResponse<string>
+                    {
+                        Success = true,
+                        Message = "Profile image deleted successfully.",
+                        Data = null,
+                        StatusCode = 200
+                    };
+                }
+                else
+                {
+                    return new ApiResponse<string>
+                    {
+                        Success = false,
+                        Message = "Failed to delete user profile image.",
+                        StatusCode = 400
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "An error occurred while deleting the profile image: " + ex.Message,
+                    StatusCode = 500
+                };
             }
         }
     }

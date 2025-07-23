@@ -38,6 +38,7 @@ namespace CareerGlide.API.Controllers
                 {
                     var mailResponse = await _accountService.SendOTPVerifyMail(entity.Email);
 
+
                     return Ok(response);
                 }
                 else

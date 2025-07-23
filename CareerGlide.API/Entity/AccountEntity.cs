@@ -107,6 +107,11 @@ namespace CareerGlide.API.Entity
         public string Message { get; set; }
     }
 
+    public class PostRegistrationSendentity
+    {
+        public string Email { get; set; }
+    }
+
     public class LoginEntity
     {
         public int UserTypeId { get; set; }

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CareerGlide.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/user")]
     [ApiController]
     public class UserApiController : ControllerBase
     {
@@ -15,24 +15,49 @@ namespace CareerGlide.API.Controllers
             this._userService = userService;
         }
 
-        [HttpGet("GetUsersData")]
-        public async Task<IActionResult> GetUsersData()
+        /// <summary>
+        /// Update User Profile Image
+        /// </summary>  
+        /// 
+
+        [HttpPost("UpdateUserProfileImage")]
+        public async Task<IActionResult> UpdateUserProfileImage(int UserId, string ProfileImageUrl)
         {
-            try
+            if (UserId <= 0 || string.IsNullOrEmpty(ProfileImageUrl))
             {
-                var response = await _userService.GetUsersData();
-                if (response.Success)
-                {
-                    return Ok(response);
-                }
-                else
-                {
-                    return NotFound(response);
-                }
+                return BadRequest("Invalid user ID or profile image URL.");
             }
-            catch (Exception ex)
+            var response = await _userService.UpdateUserProfileImage(UserId, ProfileImageUrl);
+            if (response.Success)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = $"Error retrieving users: {ex.Message}" });
+                return Ok(response);
+            }
+            else
+            {
+                return StatusCode(response.StatusCode, response.Message);
+            }
+        }
+
+        /// <summary>
+        /// Delete User Profile Image
+        /// </summary>
+        /// 
+
+        [HttpDelete("DeleteUserProfileImage/{UserId}")]
+        public async Task<IActionResult> DeleteUserProfileImage(int UserId)
+        {
+            if (UserId <= 0)
+            {
+                return BadRequest("Invalid user ID.");
+            }
+            var response = await _userService.DeleteUserProfileImage(UserId);
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+            else
+            {
+                return StatusCode(response.StatusCode, response.Message);
             }
         }
     }
