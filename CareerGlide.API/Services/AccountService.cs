@@ -26,7 +26,6 @@ namespace CareerGlide.API.Services
             {
                 var parameters = new SqlParameter[]
                 {
-                    new SqlParameter("@UserType", SqlDbType.Int) { Value = entity.UserType },
                     new SqlParameter("@Email", SqlDbType.Text) { Value = entity.Email },
                     new SqlParameter("@Password", SqlDbType.Text) { Value = entity.Password },
                     new SqlParameter("@FirstName", SqlDbType.Text) { Value = entity.FirstName },
@@ -70,7 +69,6 @@ namespace CareerGlide.API.Services
             {
                 var parameters = new SqlParameter[]
                 {
-                    new SqlParameter("@UserType", SqlDbType.Int) { Value = entity.UserType },
                     new SqlParameter("@Email", SqlDbType.Text) { Value = entity.Email },
                     new SqlParameter("@Password", SqlDbType.Text) { Value = entity.Password },
                     new SqlParameter("@FirstName", SqlDbType.Text) { Value = entity.FirstName },
@@ -114,7 +112,6 @@ namespace CareerGlide.API.Services
             {
                 var parameters = new SqlParameter[]
                 {
-                    new SqlParameter("@UserType", SqlDbType.Int) { Value = entity.UserType },
                     new SqlParameter("@Email", SqlDbType.Text) { Value = entity.LoginEmail },
                     new SqlParameter("@Password", SqlDbType.Text) { Value = entity.Password },
                     new SqlParameter("@CompanyName", SqlDbType.Text) { Value = entity.CompanyName },

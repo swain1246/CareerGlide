@@ -8,7 +8,6 @@ namespace CareerGlide.API.Entity
 
     public class StudentRegisterEntity: IValidatableObject
     {
-        public int UserType { get; set; }
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Invalid email format")]
         public string Email { get; set; }
@@ -44,7 +43,6 @@ namespace CareerGlide.API.Entity
 
     public class CompanyRegistationEntity: IValidatableObject
     {
-        public int UserType { get; set; }
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Invalid email format")]
         public string LoginEmail { get; set; }
@@ -74,7 +72,6 @@ namespace CareerGlide.API.Entity
 
     public class MentorRegisterEntity : IValidatableObject
     {
-        public int UserType { get; set; }
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Invalid email format")]
         public string Email { get; set; }
