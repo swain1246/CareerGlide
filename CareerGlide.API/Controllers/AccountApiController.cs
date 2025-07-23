@@ -38,13 +38,29 @@ namespace CareerGlide.API.Controllers
                 {
                     var mailResponse = await _accountService.SendOTPVerifyMail(entity.Email);
 
+                    var postResponce = new PostRegistrationSendentity
+                    {
+                        Email = response.Data.Email
+                    };
 
-                    return Ok(response);
+
+                    return Ok(new ApiResponse<PostRegistrationSendentity>
+                    {
+                        Success = true,
+                        Data = postResponce,
+                        Message = "Email Send Successfully",
+                        StatusCode = 200
+                    });
                 }
-                else
+
+                return BadRequest(new ApiResponse<string>
                 {
-                    return BadRequest(response);
-                }
+                    Success= false,
+                    StatusCode = response.StatusCode,
+                    Message = response.Message,
+                    Data = null
+                });
+
             }
             catch (Exception ex)
             {
@@ -67,12 +83,27 @@ namespace CareerGlide.API.Controllers
                 {
                     var mailResponse = await _accountService.SendOTPVerifyMail(entity.LoginEmail);
 
-                    return Ok(response);
+                    var postResponce = new PostRegistrationSendentity
+                    {
+                        Email = response.Data.Email
+                    };
+
+
+                    return Ok(new ApiResponse<PostRegistrationSendentity>
+                    {
+                        Success = true,
+                        Data = postResponce,
+                        Message = "Email Send Successfully",
+                        StatusCode = 200
+                    });
                 }
-                else
+                return BadRequest(new ApiResponse<string>
                 {
-                    return BadRequest(response);
-                }
+                    Success = false,
+                    StatusCode = response.StatusCode,
+                    Message = response.Message,
+                    Data = null
+                });
             }
             catch (Exception ex)
             {
@@ -96,12 +127,27 @@ namespace CareerGlide.API.Controllers
                 {
                     var mailResponse = await _accountService.SendOTPVerifyMail(entity.Email);
 
-                    return Ok(response);
+                    var postResponce = new PostRegistrationSendentity
+                    {
+                        Email = response.Data.Email
+                    };
+
+
+                    return Ok(new ApiResponse<PostRegistrationSendentity>
+                    {
+                        Success = true,
+                        Data = postResponce,
+                        Message = "Email Send Successfully",
+                        StatusCode = 200
+                    });
                 }
-                else
+                return BadRequest(new ApiResponse<string>
                 {
-                    return BadRequest(response);
-                }
+                    Success = false,
+                    StatusCode = response.StatusCode,
+                    Message = response.Message,
+                    Data = null
+                });
             }
             catch (Exception ex)
             {
@@ -150,30 +196,24 @@ namespace CareerGlide.API.Controllers
 
 
 
+        /// Login 
+        /// 
+
         [HttpPost("Login")]
-        public async Task<IActionResult> CheckLogin([FromQuery, Required(ErrorMessage = "Email is required.")]
-                                           [EmailAddress(ErrorMessage = "Invalid email format.")]
-                                           string Email, [FromQuery, Required(ErrorMessage = "Password is required.")] string Password)
+        public async Task<IActionResult> CheckLogin([FromBody] CheckLogin entity)
         {
 
-            // Validate Password
-            var passwordErrors = ValidationHelper.ValidatePassword(Password).ToList();
-            if (passwordErrors.Any())
+            var response = await _accountService.CheckLogin(entity);
+            
+            if(response.Data.StatusCode == 200)
             {
-                // Combine all password validation errors into a single message
-                var combinedErrors = string.Join(" | ", passwordErrors.Select(e => e.ErrorMessage));
-                return BadRequest(new ApiResponse<string>(null, combinedErrors, false));
-            }
-
-            var response = await _accountService.CheckLogin(Email,Password);
-            if (response.Success)
-            {
+                // Create JWT Token
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]); // Use a strong secret key
+                var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
 
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
-                    Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, Convert.ToString(Email)) }),
+                    Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, entity.Email) }),
                     Expires = DateTime.UtcNow.AddHours(1),
                     Issuer = _configuration["Jwt:Issuer"],
                     Audience = _configuration["Jwt:Audience"],
@@ -183,29 +223,35 @@ namespace CareerGlide.API.Controllers
                 var token = tokenHandler.CreateToken(tokenDescriptor);
                 var tokenString = tokenHandler.WriteToken(token);
 
+                // Set token in HttpOnly cookie
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true, // true if using HTTPS
+                    SameSite = SameSiteMode.None, // Important for cross-origin
+                    Expires = DateTime.UtcNow.AddHours(1)
+                };
+
+                Response.Cookies.Append("CareerGlideToken", tokenString, cookieOptions);
+
                 response.Data.UserToken = tokenString;
-                if (response.Data.StatusCode == 200)
-                {
-                    return Ok(response.Data);
-                }
-                else
-                {
-                    UnAuthLogin ErResult = new UnAuthLogin
-                    {
-                        StatusCode = response.Data.StatusCode,
-                        Message = response.Data.Message
-                    };
-                    return Ok(ErResult);
-                }
+
+                    return Ok(response);
             }
-            return Unauthorized(new ApiResponse<LoginEntity>
+
+
+
+            return Unauthorized(new ApiResponse<string>
             {
                 Success = false,
-                Message = response.Message,
-                Data = null
+                StatusCode = response.Data.StatusCode,
+                Message = response.Data.Message,
+                Data = null,
+
             });
 
         }
+
 
         //----------------
         // Send Forgot Password Mail API
