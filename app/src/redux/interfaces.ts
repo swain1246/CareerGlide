@@ -60,4 +60,10 @@ export interface ApiResponse<T = any> {
   message: string;
   data?: T;
   errors?: string[];
+  statusCode?: number;
+}
+
+export interface LoginPayload {
+  email: string;
+  password: string;
 }

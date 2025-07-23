@@ -3,6 +3,7 @@ import DatePicker from 'react-datepicker';
 import PhoneInput from 'react-phone-number-input';
 import { Button, Tooltip } from 'antd';
 import { Info, Visibility, VisibilityOff, Delete as DeleteIcon } from '@mui/icons-material';
+import { CustomSelectChangeEvent } from './SelectField';
 
 interface CustomDateEvent<T> {
   value: T;
@@ -22,7 +23,9 @@ type InputFieldProps = {
   placeholder: string;
   value: any;
   onChangeInput: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | CustomSelectDateEvent>,
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | CustomSelectChangeEvent | CustomSelectDateEvent
+    >,
   ) => void;
   style?: React.CSSProperties;
   onBlur?: (e: React.FocusEvent<HTMLElement | HTMLTextAreaElement>) => void;
@@ -277,6 +280,7 @@ const SinglInputField = ({
             data-trim={trim}
             data-required={required}
             data-index={dataIndex}
+            autoComplete={isPasswordField ? 'current-password' : 'off'}
             className={`w-full ${commonInputProps.className}`}
           />
           {isPasswordField && (

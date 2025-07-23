@@ -1,17 +1,18 @@
-'use client';
-
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { KeyPairInterface } from '@src/redux/interfaces';
 import { GlobalInputFieldType } from '@src/components/input/GlobalInput';
 import { AuthFormInput } from '@src/components/Auth/AuthFormInput';
-import PublicLayout from '@src/components/layout/public_layout/PublicLayout';
+import authApis from '@src/apis/authApis';
+import { message } from 'antd';
+import { APP_ROUTE } from '@src/constants';
+import flashMessage from '@src/components/FlashMessage';
+
 const LoginPage = () => {
   const router = useRouter();
-  const [state, setState] = useState<KeyPairInterface>({ email: '', password: '' });
-
+  const [state, setState] = useState<KeyPairInterface>({});
   const loginFields: GlobalInputFieldType[] = [
     {
       name: 'email',
@@ -29,8 +30,23 @@ const LoginPage = () => {
     },
   ];
 
-  const handleLogin = () => {
-    router.push('/dashboard');
+  // useEffect(() => {
+  //   flashMessage('User created successfully', 'success');
+  // }, []);
+  const handleLogin = async () => {
+    try {
+      const { success, ...response } = await authApis.LoginApi(state);
+      if (success) {
+        flashMessage('Login successful', 'success');
+        router.push(APP_ROUTE.HOME);
+        console.log('Login response:', response);
+      } else {
+        flashMessage(response.message, 'error');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      message.error('Something went wrong while logging in');
+    }
   };
 
   return (

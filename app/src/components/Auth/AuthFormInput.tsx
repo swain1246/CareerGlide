@@ -6,12 +6,12 @@ import { validateFieldError } from '@src/helper/validations/custom';
 import { APP_ROUTE } from '@src/constants';
 import { ValidateInputValue } from '@src/helper/common';
 import { AuthResendOTP } from './AuthResendOtp';
-import { KeyPairInterface } from '@src/redux/interfaces';
+import { KeyPairInterface, LoginPayload } from '@src/redux/interfaces';
 import Link from 'next/link';
 
 type AuthFormInputProps = {
   state: KeyPairInterface;
-  setState: React.Dispatch<React.SetStateAction<KeyPairInterface>>;
+  setState: React.Dispatch<React.SetStateAction<KeyPairInterface | LoginPayload>>;
   fields: GlobalInputFieldType[];
   onSubmit: () => void;
   onResend?: () => void;
@@ -40,9 +40,8 @@ export const AuthFormInput: React.FC<AuthFormInputProps> = ({
   const [error, setError] = useState<KeyPairInterface>({});
   const [accepted, setAccepted] = useState<boolean>(false);
   const [remember, setRemember] = useState<boolean>(false);
-
   const handleInputChangeEvent = (
-    e: HTMLInputElement | HTMLTextAreaElement | CustomSelectChangeEvent | CustomSelectDateEvent,
+    e: React.ChangeEvent<HTMLInputElement | CustomSelectChangeEvent | CustomSelectDateEvent>,
   ) => {
     const { error, key, value, changable } = ValidateInputValue(e);
     if (changable) {
@@ -198,7 +197,7 @@ export const AuthFormInput: React.FC<AuthFormInputProps> = ({
         <button
           type="submit"
           onClick={handleSubmit}
-          className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200"
+          className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 cursor-pointer"
         >
           {buttonTitle}
         </button>

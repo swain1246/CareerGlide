@@ -1,10 +1,7 @@
-import { message } from 'antd';
-import { NoticeType } from 'antd/es/message/interface';
+import { toast, ToastOptions, TypeOptions } from 'react-toastify';
 
-// Custom wrapper function with default configurations
-const flashMessage = (content: string, type: NoticeType = 'info', duration: number = 3): void => {
-  message.destroy(); // Clear old messages
-  message[type]({ content, duration }); // Show new message with default configurations
+const flashMessage = (content: string, type: TypeOptions = 'info', options?: ToastOptions) => {
+  toast(content, { type, ...options });
 };
 
 export default flashMessage;
