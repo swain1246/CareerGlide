@@ -44,10 +44,10 @@ public class Program
         {
             options.AddPolicy("AllowAll", policy =>
             {
-                policy.WithOrigins("http://localhost:5173") // Update as needed
+                policy.AllowAnyOrigin() // Update as needed ---WithOrigins("http://localhost:5173")
                       .AllowAnyHeader()
-                      .AllowAnyMethod()
-                      .AllowCredentials();
+                      .AllowAnyMethod();
+                      //.AllowCredentials();
             });
         });
 
@@ -68,6 +68,7 @@ public class Program
         services.AddScoped<SendEmailAPIService>();
         services.AddScoped<UserService>();
         services.AddScoped<AccountService>();
+        services.AddScoped<StudentProfileService>();
 
 
         // JWT Authentication
