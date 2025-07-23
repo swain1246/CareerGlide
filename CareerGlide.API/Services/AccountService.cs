@@ -153,14 +153,14 @@ namespace CareerGlide.API.Services
         // Check User Login
         // ---------
 
-        public async Task<ApiResponse<LoginEntity>> CheckLogin(string Email, string Password)
+        public async Task<ApiResponse<LoginEntity>> CheckLogin(CheckLogin entity)
         {
             try
             {
                 var parameters = new SqlParameter[]
                 {
-                    new SqlParameter("@Email", SqlDbType.Text) { Value = Email },
-                    new SqlParameter("@Password", SqlDbType.Text) { Value = Password },
+                    new SqlParameter("@Email", SqlDbType.Text) { Value = entity.Email },
+                    new SqlParameter("@Password", SqlDbType.Text) { Value = entity.Password },
                 };
 
                 var result = await _genericRepository.GetAsync<LoginEntity> ("CheckUserLogIn", parameters);
