@@ -229,7 +229,7 @@ namespace CareerGlide.API.Controllers
                     HttpOnly = true,
                     Secure = true, // true if using HTTPS
                     SameSite = SameSiteMode.None, // Important for cross-origin
-                    Expires = DateTime.UtcNow.AddHours(1)
+                    Expires = DateTime.UtcNow.AddMinutes(1)
                 };
 
                 Response.Cookies.Append("CareerGlideToken", tokenString, cookieOptions);
