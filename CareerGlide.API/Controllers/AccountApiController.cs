@@ -109,7 +109,7 @@ namespace CareerGlide.API.Controllers
         }
 
 
-        [HttpPost("resend-otp")]
+        [HttpPost("ResendOTP")]
         public async Task<IActionResult> ReSendOTP([FromQuery, Required(ErrorMessage = "Email is required.")]
                                            [EmailAddress(ErrorMessage = "Invalid email format.")]
                                            string Email)
@@ -136,7 +136,7 @@ namespace CareerGlide.API.Controllers
 
 
 
-        [HttpPost("Verify-register-otp")]
+        [HttpPost("VerifyRegisterOTP")]
         public async Task<IActionResult> VerifyRegisterOTP([FromQuery, Required(ErrorMessage = "Email is required.")]
                                            [EmailAddress(ErrorMessage = "Invalid email format.")]
                                            string Email, [FromQuery, Required(ErrorMessage = "OTP is required.")] int OTP)
