@@ -1,4 +1,7 @@
-﻿using CareerGlide.API.Services;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using CareerGlide.API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,6 +9,7 @@ namespace CareerGlide.API.Controllers
 {
     [Route("api/user")]
     [ApiController]
+    [Authorize]
     public class UserApiController : ControllerBase
     {
         private readonly UserService _userService;
@@ -60,5 +64,20 @@ namespace CareerGlide.API.Controllers
                 return StatusCode(response.StatusCode, response.Message);
             }
         }
+
+
+
+        [HttpGet("read-token")]
+        public IActionResult GetTokenFromCookie()
+        {
+            var email = User.FindFirst("email")?.Value;
+            var userId = User.FindFirst("userId")?.Value;
+
+            if (string.IsNullOrEmpty(email))
+                return Unauthorized("Email not found in token."); 
+
+            return Ok(new { Email = email, UserId = userId });
+        }
+
     }
 }

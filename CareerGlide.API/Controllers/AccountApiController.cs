@@ -205,15 +205,21 @@ namespace CareerGlide.API.Controllers
 
             var response = await _accountService.CheckLogin(entity);
             
-            if(response.Data.StatusCode == 200)
+            if(response.StatusCode == 200)
             {
                 // Create JWT Token
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
 
+                var claims = new[]
+                {
+                    new Claim("email", entity.Email),
+                    new Claim("userId", response.Data.UserId.ToString()) // <-- Add userId here
+                };
+
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
-                    Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, entity.Email) }),
+                    Subject = new ClaimsIdentity(claims),
                     Expires = DateTime.UtcNow.AddHours(1),
                     Issuer = _configuration["Jwt:Issuer"],
                     Audience = _configuration["Jwt:Audience"],
@@ -229,7 +235,7 @@ namespace CareerGlide.API.Controllers
                     HttpOnly = true,
                     Secure = true, // true if using HTTPS
                     SameSite = SameSiteMode.None, // Important for cross-origin
-                    Expires = DateTime.UtcNow.AddMinutes(1)
+                    Expires = DateTime.UtcNow.AddMinutes(30)
                 };
 
                 Response.Cookies.Append("CareerGlideToken", tokenString, cookieOptions);
@@ -251,6 +257,32 @@ namespace CareerGlide.API.Controllers
             });
 
         }
+
+        //--------------------
+        // Logout User
+        // -------------------
+
+        [HttpPost("Logout")]
+        public IActionResult Logout()
+        {
+            // Remove the JWT token from the cookie by setting an expired cookie
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true, // true if using HTTPS
+                SameSite = SameSiteMode.None, // Same as login
+                Expires = DateTime.UtcNow.AddDays(-1) // Set to past to expire it
+            };
+
+            Response.Cookies.Append("CareerGlideToken", "", cookieOptions);
+
+            return Ok(new
+            {
+                StatusCode = 200,
+                Message = "Logout successful"
+            });
+        }
+
 
 
         //----------------
@@ -347,5 +379,37 @@ namespace CareerGlide.API.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new { Message = $"Error resetting password: {ex.Message}" });
             }
         }
+
+        /// <summary>
+        /// Delete User Account
+        /// </summary>
+        /// 
+
+        [HttpDelete("DeleteAccount")]
+        public async Task<IActionResult> DeleteAccount()
+        {
+            var userIdClaim = User.FindFirst("userId")?.Value;
+
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+            {
+                return Unauthorized(new { Message = "Invalid or missing user ID in token." });
+            }
+            try
+            {
+                var response = await _accountService.DeleteUserAccount(userId);
+                if (response.Success)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    return BadRequest(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = $"Error deleting account: {ex.Message}" });
+            }
+        }   
     }
 }

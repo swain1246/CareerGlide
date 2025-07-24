@@ -132,6 +132,7 @@ namespace CareerGlide.API.Entity
     public class LoginEntity
     {
         public int UserTypeId { get; set; }
+        public int UserId { get; set; }
         public string Email { get; set; }
         public string StudentName { get; set; }
         public string MentorName { get; set; }

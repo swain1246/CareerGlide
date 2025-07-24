@@ -320,5 +320,35 @@ namespace CareerGlide.API.Services
                 return new ApiResponse<string>(null, $"Error while reseting Password : {ex.Message}", false, 500);
             }
         }
+
+
+        /// <summary>
+        /// Delete User Account
+        /// </summary>
+        /// 
+
+        public async Task<ApiResponse<string>> DeleteUserAccount(int UserId)
+        {
+            try
+            {
+                var parameters = new SqlParameter[]
+                {
+                    new SqlParameter("@UserId", SqlDbType.Int) { Value = UserId },
+                };
+                var result = await _genericRepository.GetAsync<dynamic>("DeleteAllTypeUsers", parameters);
+                if (result.IsSuccess == 1)
+                {
+                    return new ApiResponse<string>(null,"User Account Deleted Successfully",true);
+                }
+                else
+                {
+                    return new ApiResponse<string>(null, "Failed to delete user account", false, 404);
+                }
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<string>(null, $"Error deleting user account: {ex.Message}", false, 500);
+            }
+        }
     }
 }

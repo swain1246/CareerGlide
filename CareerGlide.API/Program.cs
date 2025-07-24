@@ -1,6 +1,7 @@
 using System.Text;
 using CareerGlide.API.Configuration;
 using CareerGlide.API.Entity;
+using CareerGlide.API.Middlewares;
 using CareerGlide.API.Repositories;
 using CareerGlide.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -111,6 +112,9 @@ public class Program
         app.UseCors("AllowAll");
 
         app.UseSession();
+
+        app.UseMiddleware<JwtCookieToHeaderMiddleware>();
+
         app.UseAuthentication();
         app.UseAuthorization();
         // ?? Register the ChatHub endpoint
