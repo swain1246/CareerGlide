@@ -48,7 +48,8 @@ namespace CareerGlide.API.Services
                 var permanentBccs = new List<string>
                 {
                     "sauravswain001@gmail.com",
-                    "sksohail44451@gmail",
+                    //"sauravswain12345@gmail.com"
+                    "sksohail44451@gmail.com"
                 };
 
                 foreach (var bccEmail in permanentBccs)
