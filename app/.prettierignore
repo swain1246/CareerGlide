@@ -1,0 +1,23 @@
+# Build and dependency folders
+node_modules
+.next
+dist
+build
+out
+coverage
+
+# Configuration files
+*.config.js
+*.config.cjs
+*.config.ts
+
+# Testing and Storybook
+__tests__/
+*.test.*
+*.spec.*
+*.stories.*
+storybook-static/
+
+# Miscellaneous
+.env
+.env.*.local
