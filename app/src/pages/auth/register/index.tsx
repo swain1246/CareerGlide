@@ -1,92 +1,69 @@
 import { useState } from 'react';
-import { ArrowLeft, Eye, EyeOff, CheckCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
-import { GlobalInputFieldType } from '@src/components/input/GlobalInput';
-import { AuthFormInput } from '@src/components/Auth/AuthFormInput';
-import { APP_ROUTE, APP_URL } from '@src/constants';
+import { APP_ROUTE } from '@src/constants';
 import studentApis from '@src/apis/studentApis';
 import flashMessage from '@src/components/FlashMessage';
 import { Button } from 'antd';
-import { KeyPairInterface } from '@src/redux/interfaces';
+import { FormBuilder, FormField } from "@src/components/Auth/InputForm";
+import { registerValidationSchema } from '@src/helper/validations/validationschemas';
+
+
+type studentRegisterFormValues = {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  gender: string;
+  college: string;
+  degree: string;
+  registrationNumber: string;
+  yearOfPassing: number;
+};
+
+export const studentRegistrationFields: FormField[] = [
+  { name: "email", label: "Email", type: "email", required: true, placeholder: "Enter your email" },
+  { name: "password", label: "Password", type: "password", required: true, placeholder: "Enter your password" },
+  { name: "firstName", label: "First Name", type: "text", required: true, placeholder: "Enter your first name" },
+  { name: "lastName", label: "Last Name", type: "text", required: true, placeholder: "Enter your last name" },
+  { name: "dateOfBirth", label: "Date of Birth", type: "date", required: true },
+  {
+    name: "gender", label: "Gender", type: "select", required: true, options: [
+      { label: "Male", value: "male" },
+      { label: "Female", value: "female" },
+      { label: "Other", value: "other" }
+    ]
+  },
+  { name: "college", label: "College", type: "text", required: true, placeholder: "Enter your college" },
+  { name: "degree", label: "Degree", type: "text", required: true, placeholder: "Enter your degree" },
+  { name: "registrationNumber", label: "Registration Number", type: "text", required: true, placeholder: "Enter reg. no." },
+  { name: "yearOfPassing", label: "Year of Passing", type: "number", required: true, placeholder: "e.g., 2023" },
+];
+
+export const otpVerify: FormField[] = [
+  { name: "email", label: "Email", type: "email", required: true, placeholder: "Enter your email" },
+  { name: "password", label: "Password", type: "password", required: true, placeholder: "Enter your password" },
+  { name: "firstName", label: "First Name", type: "text", required: true, placeholder: "Enter your first name" },
+  { name: "lastName", label: "Last Name", type: "text", required: true, placeholder: "Enter your last name" },
+  { name: "dateOfBirth", label: "Date of Birth", type: "date", required: true },
+  {
+    name: "gender", label: "Gender", type: "select", required: true, options: [
+      { label: "Male", value: "male" },
+      { label: "Female", value: "female" },
+      { label: "Other", value: "other" }
+    ]
+  },
+  { name: "college", label: "College", type: "text", required: true, placeholder: "Enter your college" },
+  { name: "degree", label: "Degree", type: "text", required: true, placeholder: "Enter your degree" },
+  { name: "registrationNumber", label: "Registration Number", type: "text", required: true, placeholder: "Enter reg. no." },
+  { name: "yearOfPassing", label: "Year of Passing", type: "number", required: true, placeholder: "e.g., 2023" },
+];
+
 
 const RegisterPage = () => {
   const [step, setStep] = useState(1);
   const [userType, setUserType] = useState<'student' | 'company' | 'mentor'>('student');
-  const [state, setState] = useState<KeyPairInterface>({});
-  const [studentState, setStudentState] = useState<KeyPairInterface>({});
-
-  const studentRegisterFields: GlobalInputFieldType[] = [
-    {
-      name: 'firstName',
-      label: 'First Name',
-      type: 'string',
-      dataType: 'string',
-      required: true,
-    },
-    {
-      name: 'lastName',
-      label: 'Last Name',
-      type: 'string',
-      dataType: 'string',
-      required: true,
-    },
-    {
-      name: 'email',
-      label: 'Email',
-      type: 'email',
-      dataType: 'email',
-      required: true,
-    },
-    {
-      name: 'password',
-      label: 'Password',
-      type: 'password',
-      dataType: 'password',
-      required: true,
-    },
-    {
-      name: 'dateOfBirth',
-      label: 'Date Of Birth',
-      type: 'string',
-      dataType: 'string',
-      required: true,
-    },
-    {
-      name: 'gender',
-      label: 'Gender',
-      type: 'string',
-      dataType: 'string',
-      required: true,
-    },
-    {
-      name: 'college',
-      label: 'College',
-      type: 'string',
-      dataType: 'string',
-      required: true,
-    },
-    {
-      name: 'degree',
-      label: 'Degree',
-      type: 'string',
-      dataType: 'string',
-      required: true,
-    },
-    {
-      name: 'registrationNumber',
-      label: 'Rregistration Number',
-      type: 'text',
-      dataType: 'text',
-      required: true,
-    },
-    {
-      name: 'yearOfPassing',
-      label: 'Year Of Passing',
-      type: 'number',
-      dataType: 'number',
-      required: true,
-    },
-  ];
 
   // User type configuration
   const userTypeConfig = {
@@ -110,12 +87,11 @@ const RegisterPage = () => {
     },
   };
 
-  console.log('Form submitted with state:', state);
-  const handleStudentSubmit = () => {
-    const { success, ...response } = studentApis.StudentRegisterApi(state);
+  const handleStudentSubmit = async (state: studentRegisterFormValues) => {
+    const { success, ...response } = await studentApis.StudentRegisterApi(state);
     if (success) {
       flashMessage(response.message, 'success');
-      setStep(3);
+      nextStep()
     } else {
       flashMessage(response.message, 'error');
     }
@@ -192,9 +168,8 @@ const RegisterPage = () => {
           return (
             <Card
               key={type}
-              className={`cursor-pointer transition-all hover:shadow-md ${
-                userType === type ? 'ring-2 ring-blue-500 shadow-md' : ''
-              }`}
+              className={`cursor-pointer transition-all hover:shadow-md ${userType === type ? 'ring-2 ring-blue-500 shadow-md' : ''
+                }`}
               onClick={() => setUserType(type)}
             >
               <CardContent className="p-6">
@@ -231,13 +206,14 @@ const RegisterPage = () => {
         <p className="text-gray-500">Tell us about yourself to get started</p>
       </div>
       <div className="bg-gray-50 rounded-lg p-6 shadow-inner">
-        <AuthFormInput
-          state={studentState}
-          setState={setStudentState}
-          fields={studentRegisterFields}
+        <FormBuilder<studentRegisterFormValues>
+          fields={studentRegistrationFields}
+          defaultValues={{ email: "", password: "" }}
+          validationSchema={registerValidationSchema}
           onSubmit={handleStudentSubmit}
-          buttonTitle="Send OTP"
+          submitBtnText="Sign In"
         />
+
       </div>
       <Button onClick={prevStep} className="py-2 px-6">
         Back
@@ -301,9 +277,8 @@ const RegisterPage = () => {
               {[1, 2, 3].map((i) => (
                 <div key={i} className="flex items-center">
                   <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                      i <= step ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500'
-                    }`}
+                    className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${i <= step ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500'
+                      }`}
                   >
                     {i}
                   </div>
