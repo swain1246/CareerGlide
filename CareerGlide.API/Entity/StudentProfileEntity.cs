@@ -6,7 +6,6 @@
 
     public class StudentProfileHeroEntity
     {
-        public int UserId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Gender { get; set; }
@@ -21,7 +20,6 @@
     public class StudentEducationEntity
     {
         public int Id { get; set; }
-        public int UserId { get; set; }
         public string Qualification { get; set; }
         //--
         public string? ExaminationBoard { get; set; } = null;
@@ -42,7 +40,6 @@
     public class StudentCertificationEntity
     {
         public int Id { get; set; }
-        public int UserId { get; set; }
         public string CertificationName { get; set; }
         public string CertificationId { get; set; }
         public string? IssuedBy { get; set; }
@@ -53,7 +50,6 @@
     public class StudentProjectEntity
     {
         public int Id { get; set; }
-        public int UserId { get; set; }
         public string ProjectName { get; set; }
         public int ProjectDuration { get; set; }
         public string? Description { get; set; } = null;
@@ -64,7 +60,6 @@
     public class StudentInternshipEntity
     {
         public int? Id { get; set; }
-        public int UserId { get; set; }
         public string CompanyName { get; set; }
         public string Designation { get; set; }
         public int InternshipDuration { get; set; }

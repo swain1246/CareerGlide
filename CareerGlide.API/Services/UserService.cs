@@ -107,5 +107,67 @@ namespace CareerGlide.API.Services
                 };
             }
         }
+
+        /// <summary>
+        /// Delete User Account
+        /// </summary>
+        /// 
+
+        public async Task<ApiResponse<string>> DeleteUserAccount(int UserId)
+        {
+            try
+            {
+                var parameters = new SqlParameter[]
+                {
+                    new SqlParameter("@UserId", SqlDbType.Int) { Value = UserId },
+                };
+                var result = await _genericRepository.GetAsync<dynamic>("DeleteAllTypeUsers", parameters);
+                if (result.IsSuccess == 1)
+                {
+                    return new ApiResponse<string>(null, "User Account Deleted Successfully", true);
+                }
+                else
+                {
+                    return new ApiResponse<string>(null, "Failed to delete user account", false, 404);
+                }
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<string>(null, $"Error deleting user account: {ex.Message}", false, 500);
+            }
+        }
+
+        /// <summary>
+        /// Count Student Profile View
+        /// </summary>
+        /// 
+
+        public async Task<ApiResponse<string>> CountStudentProfileView(int UserId, int StudentId)
+        {
+            try
+            {
+                var parameters = new SqlParameter[]
+                {
+                    new SqlParameter("@UserId", SqlDbType.Int) { Value = UserId },
+                    new SqlParameter("@StudentId", SqlDbType.Int) { Value = StudentId },
+                };
+
+                var result = await _genericRepository.GetAsync<dynamic>("UpdateStudentProfileViewCounts", parameters);
+
+                if (result.IsSuccess == 1)
+                {
+                    return new ApiResponse<string>(null, "Student profile view counted", true, 200);
+                }
+                else
+                {
+                    return new ApiResponse<string>(null, "Failed ti count the student profile view count", false, 400);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<string>(null, $"Error while Count the Student Profile View : {ex.Message}", false, 500);
+            }
+        }
     }
 }

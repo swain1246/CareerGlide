@@ -148,4 +148,30 @@ namespace CareerGlide.API.Entity
         public int StatusCode { get; set; }
         public string Message { get; set; }
     }
+
+
+    public class VerifyOTP
+    {
+        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress(ErrorMessage = "Invalid email format")]
+        public string Email { get; set; }
+        public int OTP { get; set; }
+    }
+
+    public class ForgotPassword : IValidatableObject
+    {
+        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress(ErrorMessage = "Invalid email format")]
+        public string Email { get; set; }
+        [Required(ErrorMessage = "Password is required")]
+        public string NewPassword { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+
+            foreach (var error in ValidationHelper.ValidatePassword(NewPassword))
+                yield return error;
+
+        }
+    }
 }

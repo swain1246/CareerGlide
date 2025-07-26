@@ -201,14 +201,14 @@ namespace CareerGlide.API.Services
         // Verify OTP for Registration
         // ---------
 
-        public async Task<ApiResponse<string>> VerifyRegisterMail(string Email, int OTP)
+        public async Task<ApiResponse<string>> VerifyRegisterMail(VerifyOTP entity)
         {
             try
             {
                 var parameters = new SqlParameter[]
                 {
-                    new SqlParameter("@Email", SqlDbType.Text) { Value = Email },
-                    new SqlParameter("@OTP", SqlDbType.Text) { Value = OTP },
+                    new SqlParameter("@Email", SqlDbType.Text) { Value = entity.Email },
+                    new SqlParameter("@OTP", SqlDbType.Text) { Value = entity.OTP },
                 };  
 
                 var result = await _genericRepository.GetAsync<dynamic>("VerifyOTPForRegistartion", parameters);
@@ -266,14 +266,14 @@ namespace CareerGlide.API.Services
         // Verify OTP for Forgot Password
         // ---------
 
-        public async Task<ApiResponse<string>> VerifyForgotPasswordOTP(string Email, int OTP)
+        public async Task<ApiResponse<string>> VerifyForgotPasswordOTP(VerifyOTP entity)
         {
             try
             {
                 var parameters = new SqlParameter[]
                 {
-                    new SqlParameter("@Email", SqlDbType.Text) { Value = Email },
-                    new SqlParameter("@OTP", SqlDbType.Text) { Value = OTP },
+                    new SqlParameter("@Email", SqlDbType.Text) { Value = entity.Email },
+                    new SqlParameter("@OTP", SqlDbType.Text) { Value = entity.OTP },
                 };
 
                 var result = await _genericRepository.GetAsync<dynamic>("VerifyOTPForForgotPassword", parameters);
@@ -301,14 +301,14 @@ namespace CareerGlide.API.Services
         //Reset Password
         //--------------
 
-        public async Task<ApiResponse<string>> ResetPassword(string Email,string Password)
+        public async Task<ApiResponse<string>> ResetPassword(ForgotPassword entity)
         {
             try
             {
                 var parameters = new SqlParameter[]
                 {
-                    new SqlParameter("@Email", SqlDbType.Text) { Value = Email },
-                    new SqlParameter("@NewPassword", SqlDbType.Text) { Value = Password },
+                    new SqlParameter("@Email", SqlDbType.Text) { Value = entity.Email },
+                    new SqlParameter("@NewPassword", SqlDbType.Text) { Value = entity.NewPassword },
                 };
 
                 var result = await _genericRepository.ExecuteAsync("ForgotPassword", parameters);
@@ -322,33 +322,6 @@ namespace CareerGlide.API.Services
         }
 
 
-        /// <summary>
-        /// Delete User Account
-        /// </summary>
-        /// 
-
-        public async Task<ApiResponse<string>> DeleteUserAccount(int UserId)
-        {
-            try
-            {
-                var parameters = new SqlParameter[]
-                {
-                    new SqlParameter("@UserId", SqlDbType.Int) { Value = UserId },
-                };
-                var result = await _genericRepository.GetAsync<dynamic>("DeleteAllTypeUsers", parameters);
-                if (result.IsSuccess == 1)
-                {
-                    return new ApiResponse<string>(null,"User Account Deleted Successfully",true);
-                }
-                else
-                {
-                    return new ApiResponse<string>(null, "Failed to delete user account", false, 404);
-                }
-            }
-            catch (Exception ex)
-            {
-                return new ApiResponse<string>(null, $"Error deleting user account: {ex.Message}", false, 500);
-            }
-        }
+        
     }
 }

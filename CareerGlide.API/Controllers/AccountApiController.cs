@@ -184,12 +184,10 @@ namespace CareerGlide.API.Controllers
 
 
         [HttpPost("VerifyRegisterOTP")]
-        public async Task<IActionResult> VerifyRegisterOTP([FromQuery, Required(ErrorMessage = "Email is required.")]
-                                           [EmailAddress(ErrorMessage = "Invalid email format.")]
-                                           string Email, [FromQuery, Required(ErrorMessage = "OTP is required.")] int OTP)
+        public async Task<IActionResult> VerifyRegisterOTP([FromBody] VerifyOTP entity)
         {
 
-            var Response = await _accountService.VerifyRegisterMail(Email, OTP);
+            var Response = await _accountService.VerifyRegisterMail(entity);
 
                 return Ok(Response);
         }
@@ -321,16 +319,11 @@ namespace CareerGlide.API.Controllers
 
         [HttpPost("VerifyForgotPasswordOTP")]
 
-        public async Task<IActionResult> VerifyForgotPasswordOTP([FromQuery, Required(ErrorMessage = "Email is required.")]
-                                           [EmailAddress(ErrorMessage = "Invalid email format.")] string Email, int OTP)
+        public async Task<IActionResult> VerifyForgotPasswordOTP([FromBody] VerifyOTP entity)
         {
-            if (string.IsNullOrEmpty(Email) || OTP <= 0)
-            {
-                return BadRequest(new { Message = "Invalid email or OTP." });
-            }
             try
             {
-                var response = await _accountService.VerifyForgotPasswordOTP(Email, OTP);
+                var response = await _accountService.VerifyForgotPasswordOTP(entity);
                 if (response.Success)
                 {
                     return Ok(response);
@@ -350,21 +343,13 @@ namespace CareerGlide.API.Controllers
         // Reset Password
         //---------------
 
-        [HttpPost("ResetPassword")]
-        public async Task<IActionResult> ResetPassword([FromQuery, Required(ErrorMessage = "Email is required.")]
-                                           [EmailAddress(ErrorMessage = "Invalid email format.")] string Email,
-                                            [FromQuery, Required(ErrorMessage = "Password is required.")] string NewPassword)
+        [HttpPost("ForgotPassword")]
+        public async Task<IActionResult> ResetPassword([FromBody] ForgotPassword entity)
         {
-            var passwordErrors = ValidationHelper.ValidatePassword(NewPassword).ToList();
-            if (passwordErrors.Any())
-            {
-                // Combine all password validation errors into a single message
-                var combinedErrors = string.Join(" | ", passwordErrors.Select(e => e.ErrorMessage));
-                return BadRequest(new ApiResponse<string>(null, combinedErrors, false));
-            }
+
             try
             {
-                var response = await _accountService.ResetPassword(Email, NewPassword);
+                var response = await _accountService.ResetPassword(entity);
                 if (response.Success)
                 {
                     return Ok(response);
@@ -380,36 +365,6 @@ namespace CareerGlide.API.Controllers
             }
         }
 
-        /// <summary>
-        /// Delete User Account
-        /// </summary>
-        /// 
-
-        [HttpDelete("DeleteAccount")]
-        public async Task<IActionResult> DeleteAccount()
-        {
-            var userIdClaim = User.FindFirst("userId")?.Value;
-
-            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
-            {
-                return Unauthorized(new { Message = "Invalid or missing user ID in token." });
-            }
-            try
-            {
-                var response = await _accountService.DeleteUserAccount(userId);
-                if (response.Success)
-                {
-                    return Ok(response);
-                }
-                else
-                {
-                    return BadRequest(response);
-                }
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = $"Error deleting account: {ex.Message}" });
-            }
-        }   
+           
     }
 }

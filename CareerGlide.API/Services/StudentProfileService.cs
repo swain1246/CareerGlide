@@ -67,13 +67,13 @@ namespace CareerGlide.API.Services
         /// </summary>
         ///
 
-        public async Task<ApiResponse<string>> UpdateStudentProfileHero(StudentProfileHeroEntity entity)
+        public async Task<ApiResponse<string>> UpdateStudentProfileHero(int UserId,StudentProfileHeroEntity entity)
         {
             try
             {
                 var parameter = new SqlParameter[]
                 {
-                    new SqlParameter("@UserId", SqlDbType.Int) { Value = entity.UserId },
+                    new SqlParameter("@UserId", SqlDbType.Int) { Value = UserId },
                     new SqlParameter("@FirstName", SqlDbType.Text) { Value = entity.FirstName },
                     new SqlParameter("@LastName", SqlDbType.Text) { Value = entity.LastName },
                     new SqlParameter("@Gender", SqlDbType.Text) { Value = entity.Gender },
@@ -123,14 +123,14 @@ namespace CareerGlide.API.Services
         /// </summary>
         /// 
 
-        public async Task<ApiResponse<string>> AddEUpdateStudentEducation(StudentEducationEntity entity)
+        public async Task<ApiResponse<string>> AddEUpdateStudentEducation(int UserId,StudentEducationEntity entity)
         {
             try
             {
                 var parameters = new SqlParameter[]
                 {
                     new SqlParameter("@Id",SqlDbType.Int) { Value = entity.Id },
-                    new SqlParameter("@UserId",SqlDbType.Int) { Value = entity.UserId },
+                    new SqlParameter("@UserId",SqlDbType.Int) { Value = UserId },
                     new SqlParameter("@Qualification",SqlDbType.Text) { Value = entity.Qualification },
                     new SqlParameter("@ExaminationBoard",SqlDbType.Text) { Value = entity.ExaminationBoard },
                     new SqlParameter("@MediumOfStudy",SqlDbType.Text) { Value = entity.MediumOfStudy },
@@ -192,14 +192,14 @@ namespace CareerGlide.API.Services
         /// </summary>
         /// 
 
-        public async Task<ApiResponse<string>> AddUpdateStudentCertification(StudentCertificationEntity entity)
+        public async Task<ApiResponse<string>> AddUpdateStudentCertification(int UserId,StudentCertificationEntity entity)
         {
             try
             {
                 var parameters = new SqlParameter[]
                 {
                     new SqlParameter("@Id",SqlDbType.Int) { Value = entity.Id },
-                    new SqlParameter("@UserId",SqlDbType.Int) { Value = entity.UserId },
+                    new SqlParameter("@UserId",SqlDbType.Int) { Value = UserId },
                     new SqlParameter("@CertificationName",SqlDbType.Text) { Value = entity.CertificationName },
                     new SqlParameter("@CertificationId",SqlDbType.Text) { Value = entity.CertificationId },
                     new SqlParameter("@IssuedBy",SqlDbType.Text) { Value = entity.IssuedBy },
@@ -253,14 +253,14 @@ namespace CareerGlide.API.Services
         /// </summary>
         /// 
 
-        public async Task<ApiResponse<string>> AddUpdateStudentIntership(StudentInternshipEntity entity)
+        public async Task<ApiResponse<string>> AddUpdateStudentIntership(int UserId,StudentInternshipEntity entity)
         {
             try
             {
                 var parameters = new SqlParameter[]
                 {
                     new SqlParameter("@Id",SqlDbType.Int) { Value = entity.Id },
-                    new SqlParameter("@UserId",SqlDbType.Int) { Value = entity.UserId },
+                    new SqlParameter("@UserId",SqlDbType.Int) { Value = UserId },
                     new SqlParameter("@CompanyName",SqlDbType.Text) { Value = entity.CompanyName },
                     new SqlParameter("@Designation",SqlDbType.Text) { Value = entity.Designation },
                     new SqlParameter("@InternShipDuration",SqlDbType.Int) { Value = entity.InternshipDuration },
@@ -318,14 +318,14 @@ namespace CareerGlide.API.Services
         /// </summary>
         /// 
 
-        public async Task<ApiResponse<string>> AddUpdateStudentProject(StudentProjectEntity entity)
+        public async Task<ApiResponse<string>> AddUpdateStudentProject(int UserId,StudentProjectEntity entity)
         {
             try
             {
                 var parameters = new SqlParameter[]
                 {
                     new SqlParameter("@Id",SqlDbType.Int) { Value = entity.Id },
-                    new SqlParameter("@UserId",SqlDbType.Int) { Value = entity.UserId },
+                    new SqlParameter("@UserId",SqlDbType.Int) { Value = UserId },
                     new SqlParameter("@ProjectName",SqlDbType.Text) { Value = entity.ProjectName },
                     new SqlParameter("@ProjectDuration",SqlDbType.Int) { Value = entity.ProjectDuration },
                     new SqlParameter("@Description",SqlDbType.Text) { Value = entity.Description},
