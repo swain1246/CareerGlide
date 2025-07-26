@@ -70,6 +70,9 @@ public class Program
         services.AddScoped<UserService>();
         services.AddScoped<AccountService>();
         services.AddScoped<StudentProfileService>();
+        services.AddScoped<CompanyActivityService>();
+        services.AddScoped<StudentActivityService>();
+        services.AddScoped<MentorActivityService>();
 
 
         // JWT Authentication
