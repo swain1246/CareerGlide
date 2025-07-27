@@ -1,7 +1,7 @@
 import Footer from './Footer';
 import Header from './Header';
 
-const PublicLayout = ({ children }: { children: React.ReactNode }) => {
+const PrivateLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -11,4 +11,4 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export default PublicLayout;
+export default PrivateLayout;

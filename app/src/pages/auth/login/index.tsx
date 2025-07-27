@@ -16,7 +16,9 @@ const LoginPage = () => {
 
   useEffect(() => {
     const user = JSON.parse(sessionStorage.getItem('userData') || '{}');
+    console.log('User data:', user);
     if (user.userId) {
+      console.log('User is already logged in, redirecting to home');
       router.push(APP_ROUTE.HOME);
     }
   }, [router])

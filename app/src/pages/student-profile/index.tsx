@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
     Edit,
     Plus,
@@ -27,7 +27,9 @@ import { SkillsModal } from '@src/components/modals/SkillsModal';
 import { ProjectModal } from '@src/components/modals/ProjectModal';
 import { ResumeUploadModal } from '@src/components/modals/ResumeUploadModal';
 import ScoreRing from '@src/components/pages/StudentProfile/ScoreRing';
-import PublicLayout from '@src/components/layout/public_layout';
+import PrivateLayout from '@src/components/layout/private_layout';
+import { useRouter } from 'next/router';
+import { APP_ROUTE } from '@src/constants';
 
 // Custom Button Component
 type ButtonVariant = 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
@@ -344,9 +346,17 @@ const StudentProfile = ({ student = sampleStudentData }: StudentProfileProps) =>
         .split(' ')
         .map((n) => n[0])
         .join('');
+    const router = useRouter();
+
+    useEffect(() => {
+        const user = JSON.parse(sessionStorage.getItem('userData') || '{}');
+        if (!user.userId) {
+            router.push(APP_ROUTE.HOME);
+        }
+    }, [router])
 
     return (
-        <PublicLayout>
+        <PrivateLayout>
             <div className="min-h-screen bg-gray-50 p-4 md:p-6 space-y-6">
                 <div className="max-w-6xl mx-auto gap-6 flex flex-col">
                     {/* Quick Actions */}
@@ -823,7 +833,7 @@ const StudentProfile = ({ student = sampleStudentData }: StudentProfileProps) =>
                 <ProjectModal isOpen={modals.project} onClose={() => toggleModal('project')} />
                 <ResumeUploadModal isOpen={modals.resume} onClose={() => toggleModal('resume')} />
             </div>
-        </PublicLayout>
+        </PrivateLayout>
     );
 };
 
