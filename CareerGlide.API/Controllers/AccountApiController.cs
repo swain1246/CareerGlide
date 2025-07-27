@@ -68,7 +68,7 @@ namespace CareerGlide.API.Controllers
             }
         }
 
-        [HttpPost("CompanyRegistration")]
+        [HttpPost("CompanyRegister")]
 
         public async Task<IActionResult> CompanyRegistration([FromBody] CompanyRegistationEntity entity)
         {
@@ -112,7 +112,7 @@ namespace CareerGlide.API.Controllers
         }
 
 
-        [HttpPost("MentorRegistration")]
+        [HttpPost("MentorRegister")]
 
         public async Task<IActionResult> MentorRegistration([FromBody] MentorRegisterEntity entity)
         {
