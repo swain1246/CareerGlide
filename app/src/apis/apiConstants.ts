@@ -1,6 +1,4 @@
-export const ORGANIZATION = {};
-
-export const STUDENT = {};
+export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? '';
 
 export const AUTH_APIS = {
   LOGIN: '/auth/Login',

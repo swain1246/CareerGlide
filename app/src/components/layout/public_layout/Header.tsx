@@ -1,5 +1,3 @@
-'use client';
-
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
@@ -244,13 +242,13 @@ export const Header = () => {
               {!isAuthenticated && (
                 <div className="flex flex-col gap-2 pt-4 border-t">
                   <Link
-                    href="/login"
+                    href="/auth/login"
                     className="text-sm font-medium text-gray-700 hover:text-blue-600 transition"
                   >
                     Login
                   </Link>
                   <Link
-                    href="/register"
+                    href="/auth/register"
                     className="text-center px-4 py-2 bg-gradient-to-br from-blue-600 to-purple-600 text-white rounded-md text-sm font-medium hover:opacity-90 transition"
                   >
                     Get Started

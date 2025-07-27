@@ -1,59 +1,30 @@
-"use client";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
-import { useState } from "react";
-import * as yup from "yup";
-import { message } from "antd";
-
-import authApis from "@src/apis/authApis";
-import { APP_ROUTE } from "@src/constants";
-import flashMessage from "@src/components/FlashMessage";
-import { FormBuilder, FormField } from "@src/components/Auth/InputForm";
-import { loginValidationSchema } from "@src/helper/validations/validationschemas";
-
-type LoginFormValues = {
-  email: string;
-  password: string;
-};
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
+import { message } from 'antd';
+import authApis from '@src/apis/authApis';
+import { APP_ROUTE } from '@src/constants';
+import flashMessage from '@src/components/FlashMessage';
+import { FormBuilder, FormField } from '@src/components/input/FormBuilder';
+import { loginValidationSchema } from '@src/components/helper/form/FormValidations';
+import { LoginFormValuesType } from '@src/components/helper/form/FormValues';
+import { loginFields } from '@src/components/helper/form/FormFields';
 
 const LoginPage = () => {
   const router = useRouter();
-  const initialLoginValues: LoginFormValues = {
-    email: "",
-    password: "",
-  };
-  const loginFields: FormField[] = [
-    {
-      name: "email",
-      label: "Email",
-      type: "email",
-      placeholder: "Enter your email",
-      required: true,
-    },
-    {
-      name: "password",
-      label: "Password",
-      type: "password",
-      placeholder: "Enter your password",
-      required: true,
-    },
-  ];
 
-
-
-  const handleLogin = async (values: LoginFormValues) => {
+  const handleLogin = async (values: LoginFormValuesType) => {
     try {
       const { success, ...response } = await authApis.LoginApi(values);
       if (success) {
-        flashMessage("Login successful", "success");
+        flashMessage('Login successful', 'success');
         router.push(APP_ROUTE.HOME);
       } else {
-        flashMessage(response.message, "error");
+        flashMessage(response.message, 'error');
       }
     } catch (error) {
-      console.error("Login error:", error);
-      message.error("Something went wrong while logging in");
+      console.error('Login error:', error);
+      message.error('Something went wrong while logging in');
     }
   };
 
@@ -68,13 +39,13 @@ const LoginPage = () => {
             Continue your journey to career success. Connect, learn, and grow with our platform.
           </p>
           <div className="space-y-3">
-            {["Browse Opportunities", "Connect with Mentors", "Advance Your Career"].map(
+            {['Browse Opportunities', 'Connect with Mentors', 'Advance Your Career'].map(
               (feature, index) => (
                 <div key={index} className="flex items-center space-x-2 text-white/80">
                   <div className="w-2 h-2 bg-white rounded-full"></div>
                   <span>{feature}</span>
                 </div>
-              )
+              ),
             )}
           </div>
         </div>
@@ -97,10 +68,9 @@ const LoginPage = () => {
             <p className="text-gray-600">Access your CareerGlide account</p>
           </div>
 
-          {/* ✅ FormBuilder Replaces AuthFormInput Here */}
-          <FormBuilder<LoginFormValues>
+          {/* Form */}
+          <FormBuilder<LoginFormValuesType>
             fields={loginFields}
-            defaultValues={initialLoginValues}
             validationSchema={loginValidationSchema}
             onSubmit={handleLogin}
             submitBtnText="Sign In"

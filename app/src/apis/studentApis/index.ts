@@ -1,4 +1,4 @@
-import { ApiResponse } from '@src/redux/interfaces';
+import { ApiResponse } from '@src/interfaces';
 import { API } from '../api';
 import { AUTH_APIS } from '../apiConstants';
 
@@ -12,13 +12,3 @@ const ReturnError = (error: any): ApiResponse => ({
 });
 
 // ================= COMMON AUTH ================= //
-
-export const StudentRegisterApi = (data: Record<string, unknown>): any =>
-  API.post(AUTH_APIS.STUDENT_REGISTER, data)
-    .then((res) => res.data)
-    .then(ReturnSuccess)
-    .catch(ReturnError);
-
-export default {
-  StudentRegisterApi,
-};

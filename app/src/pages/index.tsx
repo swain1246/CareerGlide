@@ -1,8 +1,8 @@
-import CTASection from '@src/components/Home/CTASection';
-import FeatureSection from '@src/components/Home/FeatureSection';
-import HeroSection from '@src/components/Home/HeroSection';
-import RecentJobSection from '@src/components/Home/RecentJobSection';
-import TestimonialSection from '@src/components/Home/TestimonialSection';
+import CTASection from '@src/components/pages/Home/CTASection';
+import FeatureSection from '@src/components/pages/Home/FeatureSection';
+import HeroSection from '@src/components/pages/Home/HeroSection';
+import RecentJobSection from '@src/components/pages/Home/RecentJobSection';
+import TestimonialSection from '@src/components/pages/Home/TestimonialSection';
 import PublicLayout from '@src/components/layout/public_layout/PublicLayout';
 
 export const Home = () => {
@@ -20,9 +20,6 @@ export const Home = () => {
 
         {/* Recent Jobs Section */}
         <RecentJobSection />
-
-        {/* CTA Section */}
-        {/* <CTASection /> */}
       </div>
     </PublicLayout>
   );

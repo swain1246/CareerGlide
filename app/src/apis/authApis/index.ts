@@ -1,9 +1,8 @@
-import { ApiResponse } from '@src/redux/interfaces';
+/* eslint-disable */
+import { ApiResponse } from '@src/interfaces';
 import { API } from '../api';
 import { AUTH_APIS } from '../apiConstants';
-import { API_URL } from '@src/constants';
 
-// ✅ Error handler
 const ReturnError = (error: any): ApiResponse<null> => ({
   success: false,
   message: error?.response?.data?.message || error?.message || 'An error occurred',
@@ -11,34 +10,41 @@ const ReturnError = (error: any): ApiResponse<null> => ({
   data: null,
 });
 
+export const ReturnSuccess = <T>(response: ApiResponse<T>): T | undefined => {
+  return response?.data;
+};
+
 // ================= COMMON AUTH ================= //
 
-export const LoginApi = (data: Record<string, unknown>) =>
-  API.post(AUTH_APIS.LOGIN, data)
-    .then((res) => res.data) // extract the response body
+export const StudentRegisterApi = (data: Record<string, unknown>): any =>
+  API.post(AUTH_APIS.STUDENT_REGISTER, data).then(ReturnSuccess).catch(ReturnError);
+
+export const MentorRegisterApi = (data: Record<string, unknown>): any =>
+  API.post(AUTH_APIS.MENTOR_REGISTER, data).then(ReturnSuccess).catch(ReturnError);
+
+export const CompanyRegisterApi = (data: Record<string, unknown>): any =>
+  API.post(AUTH_APIS.COMPANY_REGISTER, data).then(ReturnSuccess).catch(ReturnError);
+
+export const LoginApi = (data: Record<string, unknown>): any =>
+  API.post(AUTH_APIS.LOGIN, data).then(ReturnSuccess).catch(ReturnError);
+
+export const VerifyOtpApi = (email: string, otp: string): any =>
+  API.post(AUTH_APIS.VERIFY_OTP, {
+    Email: email,
+    Otp: otp,
+  })
+    .then(ReturnSuccess)
     .catch(ReturnError);
 
-export const LogoutApi = () =>
-  API.post(AUTH_APIS.LOG_OUT)
-    .then((res) => res.data)
-    .catch(ReturnError);
-
-export const VerifyMeApi = () =>
-  API.get(AUTH_APIS.VERIFY_ME)
-    .then((res) => res.data)
-    .catch(ReturnError);
-
-export const VerifyOtpApi = (data: Record<string, unknown>) =>
-  API.post(AUTH_APIS.VERIFY_OTP, data)
-    .then((res) => res.data)
-    .catch(ReturnError);
-
-export const ResendOtpApi = (data: Record<string, unknown>) =>
-  API.post(AUTH_APIS.RESEND_OTP, data)
-    .then((res) => res.data)
+export const ResendOtpApi = (email: string): any =>
+  API.post(`${AUTH_APIS.RESEND_OTP}?Email=${encodeURIComponent(email)}`)
+    .then(ReturnSuccess)
     .catch(ReturnError);
 
 export default {
+  StudentRegisterApi,
+  MentorRegisterApi,
+  CompanyRegisterApi,
   LoginApi,
   VerifyOtpApi,
   ResendOtpApi,
