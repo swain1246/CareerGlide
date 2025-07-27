@@ -409,10 +409,8 @@ const RegisterPage = () => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    console.log('Form Data:', formData);
     try {
       const isValid = validateForm();
-      console.log('Is Valid Form:', isValid);
       if (!isValid) return;
 
       let response;
@@ -428,7 +426,6 @@ const RegisterPage = () => {
           response = await authApis.MentorRegisterApi(mentorData);
           break;
         case 'company':
-          console.log(formData, 'formData');
           response = await authApis.CompanyRegisterApi(formData);
           break;
         default:

@@ -14,8 +14,6 @@
 //   VERIFY_ME: '/auth/me',
 // };
 
-
-
 export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? '';
 
 export const AUTH_APIS = {
@@ -31,4 +29,3 @@ export const AUTH_APIS = {
   LOG_OUT: `${API_URL}/auth/logout`,
   VERIFY_ME: `${API_URL}/auth/me`,
 };
-

@@ -1,7 +1,6 @@
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import { message } from 'antd';
 import authApis from '@src/apis/authApis';
 import { APP_ROUTE } from '@src/constants';
 import flashMessage from '@src/components/FlashMessage';
@@ -16,26 +15,26 @@ const LoginPage = () => {
 
   useEffect(() => {
     const user = JSON.parse(sessionStorage.getItem('userData') || '{}');
-    console.log('User data:', user);
     if (user.userId) {
-      console.log('User is already logged in, redirecting to home');
       router.push(APP_ROUTE.HOME);
     }
-  }, [router])
+  }, [router]);
 
   const handleLogin = async (values: LoginFormValuesType) => {
     try {
       const { success, ...response } = await authApis.LoginApi(values);
       if (success) {
-        flashMessage('Login successful', 'success');
+        flashMessage('Login Successful', 'success');
         sessionStorage.setItem('userData', JSON.stringify(response.data));
-        router.push(APP_ROUTE.HOME);
+        if (response.data.userTypeId === 3) {
+          router.push(APP_ROUTE.STUDENT_DASHBOARD);
+        }
       } else {
         flashMessage(response.message, 'error');
       }
     } catch (error) {
+      flashMessage('Login error:', 'error');
       console.error('Login error:', error);
-      message.error('Something went wrong while logging in');
     }
   };
 

@@ -13,4 +13,8 @@ export const APP_ROUTE = {
   LOGIN: '/auth/login',
   REGISTER: '/auth/register',
   FORGOT_PASSWORD: '/auth/forgot-password',
+
+  // STUDENT ROUTES
+  STUDENT_PROFILE: '/student-profile',
+  STUDENT_DASHBOARD: '/student-dashboard',
 };
