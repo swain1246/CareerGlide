@@ -5,13 +5,15 @@ WORKDIR /app
 # Install pnpm
 RUN npm install -g pnpm
 
-# Copy lock file and package.json
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
 # 2. Build the Next.js app
 FROM node:18-alpine AS builder
 WORKDIR /app
+
+# Install pnpm again in this stage
+RUN npm install -g pnpm
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -24,8 +26,8 @@ WORKDIR /app
 ENV NODE_ENV production
 ENV PORT 3000
 
-# Install pnpm and copy only the necessary build output
 RUN npm install -g pnpm
+
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
