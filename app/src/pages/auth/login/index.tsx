@@ -9,15 +9,26 @@ import { FormBuilder, FormField } from '@src/components/input/FormBuilder';
 import { loginValidationSchema } from '@src/components/helper/form/FormValidations';
 import { LoginFormValuesType } from '@src/components/helper/form/FormValues';
 import { loginFields } from '@src/components/helper/form/FormFields';
+import { useEffect } from 'react';
 
 const LoginPage = () => {
   const router = useRouter();
+
+  useEffect(() => {
+    const user = JSON.parse(sessionStorage.getItem('userData') || '{}');
+    console.log('User data:', user);
+    if (user.userId) {
+      console.log('User is already logged in, redirecting to home');
+      router.push(APP_ROUTE.HOME);
+    }
+  }, [router])
 
   const handleLogin = async (values: LoginFormValuesType) => {
     try {
       const { success, ...response } = await authApis.LoginApi(values);
       if (success) {
         flashMessage('Login successful', 'success');
+        sessionStorage.setItem('userData', JSON.stringify(response.data));
         router.push(APP_ROUTE.HOME);
       } else {
         flashMessage(response.message, 'error');
