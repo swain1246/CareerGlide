@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosPromise, AxiosRequestConfig, AxiosProgressEvent } from 'axios';
-import { API_URL } from '@src/constants';
 
 import flashMessage from '@src/components/FlashMessage';
+import { API_URL } from '../apiConstants';
 export type HTTPMethod = 'get' | 'post' | 'delete' | 'put' | 'patch';
 export type GoogleHTTPMethod = 'get' | 'post';
 
