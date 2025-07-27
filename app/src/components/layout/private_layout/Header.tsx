@@ -2,39 +2,20 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { LogOut, Settings, Menu, X, Briefcase, User as UserIcon, ChevronDown } from 'lucide-react';
-import { APP_ROUTE } from '@src/constants';
-
-// Helper function to get user initials
-const getInitials = (name: string | null) => {
-  if (!name) return '?';
-  const names = name.split(' ');
-  let initials = names[0].substring(0, 1).toUpperCase();
-  if (names.length > 1) {
-    initials += names[names.length - 1].substring(0, 1).toUpperCase();
-  }
-  return initials;
-};
 
 export const Header = () => {
   const router = useRouter();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [userData, setUserData] = useState<any>({});
-
-  useEffect(() => {
-    const user = JSON.parse(sessionStorage.getItem('userData') || '{}');
-    setUserData(user);
-  }, []);
-
-  const isAuthenticated = !!userData?.userId;
-  const userName = userData.studentName || userData.companyName || userData.mentorName || userData.adminName;
-  const userInitials = getInitials(userName);
-  const userRole = userData.userTypeId === 3 ? 'Student' :
-    userData.userTypeId === 2 ? 'Company' :
-      userData.userTypeId === 4 ? 'Mentor' :
-        userData.userTypeId === 1 ? 'Admin' : 'User';
-
   const isActive = (path: string) => router.pathname === path;
+
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user] = useState({
+    name: 'John Doe',
+    email: 'john@example.com',
+    role: 'student',
+    initials: 'JD',
+  });
 
   const navLinks = [
     { href: '/jobs', label: 'Jobs' },
@@ -61,11 +42,8 @@ export const Header = () => {
   }, []);
 
   const handleLogout = () => {
-    sessionStorage.removeItem('userData');
-    setUserData({});
-    setDropdownOpen(false);
-    setMobileMenuOpen(false);
-    router.push('/');
+    setIsAuthenticated(false);
+    alert('Logged out!');
   };
 
   return (
@@ -87,8 +65,9 @@ export const Header = () => {
             {/* Home */}
             <Link
               href="/"
-              className={`font-medium transition-colors ${isActive('/') ? 'text-blue-600' : 'text-gray-800 hover:text-blue-600'
-                }`}
+              className={`font-medium transition-colors ${
+                isActive('/') ? 'text-blue-600' : 'text-gray-800 hover:text-blue-600'
+              }`}
             >
               Home
             </Link>
@@ -158,8 +137,9 @@ export const Header = () => {
             {/* Mentors */}
             <Link
               href="/mentors"
-              className={`font-medium transition-colors ${isActive('/mentors') ? 'text-blue-600' : 'text-gray-800 hover:text-blue-600'
-                }`}
+              className={`font-medium transition-colors ${
+                isActive('/mentors') ? 'text-blue-600' : 'text-gray-800 hover:text-blue-600'
+              }`}
             >
               Mentors
             </Link>
@@ -172,40 +152,38 @@ export const Header = () => {
                 <button
                   id="user-button"
                   onClick={() => setDropdownOpen((prev) => !prev)}
-                  className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 text-white font-semibold shadow hover:shadow-md transition cursor-pointer flex items-center justify-center"
+                  className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 text-white font-semibold shadow hover:shadow-md transition cursor-pointer"
                   aria-label="User Menu"
                   aria-expanded={dropdownOpen}
                   aria-haspopup="true"
                 >
-                  {userInitials}
+                  {user.initials}
                 </button>
 
-                {/* Profile Dropdown */}
+                {/* Dropdown */}
                 {dropdownOpen && (
                   <div
                     id="user-dropdown"
                     className="absolute right-0 mt-3 w-56 bg-white border rounded-lg shadow-lg z-50 animate-fadeIn"
                   >
                     <div className="px-4 py-3 border-b">
-                      <p className="font-semibold text-black">{userName}</p>
-                      <p className="text-gray-500 text-xs">{userData.email}</p>
-                      <p className="text-xs text-blue-600 capitalize">{userRole}</p>
+                      <p className="font-semibold">{user.name}</p>
+                      <p className="text-gray-500 text-xs">{user.email}</p>
+                      <p className="text-xs text-blue-600 capitalize">{user.role}</p>
                     </div>
-                    <Link href="/student-profile">
-                      <div className="px-4 py-2 hover:bg-gray-100 flex items-center cursor-pointer transition text-black">
-                        <UserIcon className="w-4 h-4 mr-2 " />
-                        Profile
+                    <Link href="/student/dashboard">
+                      <div className="px-4 py-2 hover:bg-gray-100 flex items-center cursor-pointer transition">
+                        <UserIcon className="w-4 h-4 mr-2" />
+                        Dashboard
                       </div>
                     </Link>
-                    <Link href="/change-password">
-                      <div className="px-4 py-2 hover:bg-gray-100 flex items-center cursor-pointer transition text-black">
-                        <Settings className="w-4 h-4 mr-2 " />
-                        Change Password
-                      </div>
-                    </Link>
+                    <div className="px-4 py-2 hover:bg-gray-100 flex items-center cursor-pointer transition">
+                      <Settings className="w-4 h-4 mr-2" />
+                      Settings
+                    </div>
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center cursor-pointer transition text-black"
+                      className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center cursor-pointer transition"
                     >
                       <LogOut className="w-4 h-4 mr-2" />
                       Logout
@@ -251,8 +229,9 @@ export const Header = () => {
                   <Link
                     key={href}
                     href={href}
-                    className={`px-3 py-2 rounded-md text-sm font-medium transition ${isActive ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'
-                      }`}
+                    className={`px-3 py-2 rounded-md text-sm font-medium transition ${
+                      isActive ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'
+                    }`}
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {label}
@@ -260,45 +239,17 @@ export const Header = () => {
                 );
               })}
 
-              {isAuthenticated ? (
-                <div className="flex flex-col gap-2 pt-4 border-t">
-                  <Link
-                    href="/student-profile"
-                    className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 transition"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Profile
-                  </Link>
-                  <Link
-                    href="/change-password"
-                    className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 transition"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Change Password
-                  </Link>
-                  <button
-                    onClick={() => {
-                      handleLogout();
-                      setMobileMenuOpen(false);
-                    }}
-                    className="px-3 py-2 rounded-md text-sm font-medium text-left text-gray-700 hover:bg-gray-100 transition"
-                  >
-                    Logout
-                  </button>
-                </div>
-              ) : (
+              {!isAuthenticated && (
                 <div className="flex flex-col gap-2 pt-4 border-t">
                   <Link
                     href="/auth/login"
                     className="text-sm font-medium text-gray-700 hover:text-blue-600 transition"
-                    onClick={() => setMobileMenuOpen(false)}
                   >
                     Login
                   </Link>
                   <Link
                     href="/auth/register"
                     className="text-center px-4 py-2 bg-gradient-to-br from-blue-600 to-purple-600 text-white rounded-md text-sm font-medium hover:opacity-90 transition"
-                    onClick={() => setMobileMenuOpen(false)}
                   >
                     Get Started
                   </Link>
