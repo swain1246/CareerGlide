@@ -45,7 +45,8 @@ public class Program
         {
             options.AddPolicy("AllowAll", policy =>
             {
-                policy.WithOrigins("http://localhost:3000") // Update as needed ---WithOrigins("http://localhost:5173")
+                policy.WithOrigins("http://localhost:3000",
+                                    "https://careerglide-ui.onrender.com") 
                       .AllowAnyHeader()
                       .AllowAnyMethod()
                       .AllowCredentials();
