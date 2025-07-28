@@ -231,7 +231,7 @@ namespace CareerGlide.API.Controllers
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = true, // true if using HTTPS
+                    Secure = false, // true if using HTTPS
                     SameSite = SameSiteMode.None, // Important for cross-origin
                     Expires = DateTime.UtcNow.AddMinutes(30)
                 };
