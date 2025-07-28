@@ -203,7 +203,7 @@ namespace CareerGlide.API.Controllers
 
             var response = await _accountService.CheckLogin(entity);
             
-            if(response.StatusCode == 200)
+            if(response.Data.StatusCode == 200)
             {
                 // Create JWT Token
                 var tokenHandler = new JwtSecurityTokenHandler();
