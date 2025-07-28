@@ -3,7 +3,7 @@ import FeatureSection from '@src/components/pages/Home/FeatureSection';
 import HeroSection from '@src/components/pages/Home/HeroSection';
 import RecentJobSection from '@src/components/pages/Home/RecentJobSection';
 import TestimonialSection from '@src/components/pages/Home/TestimonialSection';
-import PublicLayout from '@src/components/layout/public_layout/PublicLayout';
+import PublicLayout from '@src/components/layout/public_layout';
 
 export const Home = () => {
   return (
