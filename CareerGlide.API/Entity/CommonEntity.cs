@@ -12,4 +12,10 @@
         public string HostEmailAppPassword { get; set; }
         public string SenderName { get; set; }
     }
+
+    public class BindTechnicalStacks
+    {
+        public int StackId { get; set; }
+        public string StackName { get; set; }
+    }
 }

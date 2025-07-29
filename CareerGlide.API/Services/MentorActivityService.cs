@@ -27,9 +27,10 @@ namespace CareerGlide.API.Services
                 {
                     new SqlParameter("@UserId", SqlDbType.Int) { Value = UserId },
                     new SqlParameter("@StudentId", SqlDbType.Int) { Value = entity.StudentId },
-                    new SqlParameter("@ProjectTitle", SqlDbType.Text) { Value = entity.ProjectTitle }, 
+                    new SqlParameter("@Title", SqlDbType.Text) { Value = entity.Title }, 
                     new SqlParameter("@Description", SqlDbType.Text) { Value = entity.Description }, 
-                    new SqlParameter("@MessageFromMentor", SqlDbType.Text) { Value = entity.Notes }, 
+                    new SqlParameter("@MessageFromMentor", SqlDbType.Text) { Value = entity.MentorMessage }, 
+                    new SqlParameter("@InvitePerpose", SqlDbType.Text) { Value = entity.InvitePerpose }, 
                 };
                 var result = await _genericRepository.GetAsync<dynamic>("SendInvitations", parameters);
                 if (result.IsSuccess == 1)
