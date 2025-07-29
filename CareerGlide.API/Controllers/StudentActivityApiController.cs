@@ -82,5 +82,54 @@ namespace CareerGlide.API.Controllers
                 return StatusCode(response.StatusCode, response.Message);
             }
         }
+
+        /// <summary>
+        /// Get Mentors Invitations
+        /// </summary>
+        /// 
+
+        [HttpGet("GetMentorsInvitations")]
+        public async Task<IActionResult> GetMentorsInvitations()
+        {
+            var userIdClaim = User.FindFirst("userId")?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+            {
+                return Unauthorized(new { Message = "Invalid or missing user ID in token." });
+            }
+            var response = await _studentActivityService.GetMentorInvitations(userId);
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+            else
+            {
+                return StatusCode(response.StatusCode, response.Message);
+            }
+        }
+
+
+        /// <summary>
+        /// Get Mentership Request
+        /// </summary>
+        /// 
+
+        [HttpGet("GetMentorshipRequest")]
+        public async Task<IActionResult> GetMentorshipRequest()
+        {
+            var userIdClaim = User.FindFirst("userId")?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+            {
+                return Unauthorized(new { Message = "Invalid or missing user ID in token." });
+            }
+            var response = await _studentActivityService.GetMentorshipRequest(userId);
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+            else
+            {
+                return StatusCode(response.StatusCode, response.Message);
+            }
+        }
     }
 }

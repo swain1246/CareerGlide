@@ -13,4 +13,30 @@
         public string ResumePath { get; set; }
         public string CoverLetter { get; set; }
     }
+
+    public class GetInvitations
+    {
+        public int Id { get; set; }
+        public int MentorId { get; set; }
+        public string ProfileImageUrl { get; set; }
+        public string Name { get; set; }
+        public string WorkAt { get; set; }
+        public DateOnly SentDate { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public string Status { get; set; }
+        public string MentorMessage { get; set; }
+    }
+
+    public class GetMentorshipRequests
+    {
+        public int Id { get; set; }
+        public int StackId { get; set; }
+        public string StackName { get; set; }
+        public string MentorshipType { get; set; }
+        public string Description { get; set; }
+        public string Status { get; set; }
+        public string AdminRemarks { get; set; }
+        public DateTime RequestDate { get; set; }
+    }
 }
