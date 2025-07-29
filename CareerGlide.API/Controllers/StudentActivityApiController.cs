@@ -84,6 +84,49 @@ namespace CareerGlide.API.Controllers
         }
 
         /// <summary>
+        /// ViewMentorProfile
+        /// </summary>
+        /// 
+
+        [HttpGet("ViewMentorProfile")]
+        public async Task<IActionResult> ViewMentorProfile(int MentorId)
+        {
+            var response = await _studentActivityService.ViewMentorProfile(MentorId);
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+            else
+            {
+                return StatusCode(response.StatusCode, response.Message);
+            }
+        }
+
+        /// <summary>
+        /// AddUpdateMentershipRequest
+        ///  </summary>
+        ///
+
+        [HttpPost("AddUpdateMentorshipRequest")]
+        public async Task<IActionResult> AddUpdateMentorshipRequest([FromBody] AddUpdateMentershipRequest entity)
+        {
+            var userIdClaim = User.FindFirst("userId")?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+            {
+                return Unauthorized(new { Message = "Invalid or missing user ID in token." });
+            }
+            var response = await _studentActivityService.AddUpdateMentershipRequest(userId, entity);
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+            else
+            {
+                return StatusCode(response.StatusCode, response.Message);
+            }
+        }
+
+        /// <summary>
         /// Get Mentors Invitations
         /// </summary>
         /// 

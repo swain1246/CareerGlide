@@ -113,6 +113,68 @@ namespace CareerGlide.API.Services
         }
 
         /// <summary>
+        /// ViewMentorProfile
+        ///   </summary>
+        ///
+
+        public async Task<ApiResponse<ViewMentorProfile>> ViewMentorProfile(int MentorId)
+        {
+            try
+            {
+                var parameters = new SqlParameter[]
+                {
+                    new SqlParameter("@MentorId", SqlDbType.Int) { Value = MentorId }
+                };
+                var result = await _genericRepository.GetAsync<ViewMentorProfile>("ViewMentorProfile", parameters);
+                if (result != null)
+                {
+                    return new ApiResponse<ViewMentorProfile>(result, "Mentor profile retrieved successfully.", true, 200);
+                }
+                else
+                {
+                    return new ApiResponse<ViewMentorProfile>(null, "Failed to retrieve mentor profile.", false, 404);
+                }
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<ViewMentorProfile>(null, $"Error while viewing mentor profile: {ex.Message}", false, 500);
+            }
+        }
+
+        /// <summary>
+        /// AddUpdateMentershipRequest
+        ///  </summary>
+        ///
+
+        public async Task<ApiResponse<string>> AddUpdateMentershipRequest(int userId,AddUpdateMentershipRequest request)
+        {
+            try
+            {
+                var parameters = new SqlParameter[]
+                {
+                    new SqlParameter("@Id", SqlDbType.Int) { Value = request.Id },
+                    new SqlParameter("@UserId", SqlDbType.Int) { Value = userId },
+                    new SqlParameter("@StackId", SqlDbType.Int) { Value = request.StackId },
+                    new SqlParameter("@MentoeshipType", SqlDbType.Text) { Value = request.MentoeshipType },
+                    new SqlParameter("@Description", SqlDbType.Text) { Value = request.Description }
+                };
+                var result = await _genericRepository.GetAsync<dynamic>("AddUpdateMentershipRequest", parameters);
+                if (result.IsSuccess == 1)
+                {
+                    return new ApiResponse<string>(null, "Mentorship request processed successfully.", true, 200);
+                }
+                else
+                {
+                    return new ApiResponse<string>(null, "Failed to process mentorship request.", false, 400);
+                }
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<string>(null, $"Error while adding/updating mentorship request: {ex.Message}", false, 500);
+            }
+        }
+
+        /// <summary>
         /// Get Mentors invitations
         /// </summary>
         /// 
