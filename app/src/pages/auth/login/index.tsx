@@ -21,7 +21,7 @@ const LoginPage = () => {
       console.log('User is already logged in, redirecting to home');
       router.push(APP_ROUTE.HOME);
     }
-  }, [router])
+  }, [router]);
 
   const handleLogin = async (values: LoginFormValuesType) => {
     try {

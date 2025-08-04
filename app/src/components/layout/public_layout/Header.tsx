@@ -1,7 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { LogOut, Settings, Menu, X, Briefcase, User as UserIcon, ChevronDown, Bookmark, Lock } from 'lucide-react';
+import {
+  LogOut,
+  Settings,
+  Menu,
+  X,
+  Briefcase,
+  User as UserIcon,
+  ChevronDown,
+  Bookmark,
+  Lock,
+} from 'lucide-react';
 import { APP_ROUTE } from '@src/constants';
 
 // Helper function to get user initials
@@ -27,13 +37,20 @@ export const Header = () => {
   }, []);
 
   const isAuthenticated = !!userData?.userId;
-  const userName = userData.studentName || userData.companyName || userData.mentorName || userData.adminName;
+  const userName =
+    userData.studentName || userData.companyName || userData.mentorName || userData.adminName;
   const userEmail = userData.email || userData.LoginEmail || userData.email || userData.email;
   const userInitials = getInitials(userName);
-  const userRole = userData.userTypeId === 3 ? 'Student' :
-    userData.userTypeId === 2 ? 'Company' :
-      userData.userTypeId === 4 ? 'Mentor' :
-        userData.userTypeId === 1 ? 'Admin' : 'User';
+  const userRole =
+    userData.userTypeId === 3
+      ? 'Student'
+      : userData.userTypeId === 2
+        ? 'Company'
+        : userData.userTypeId === 4
+          ? 'Mentor'
+          : userData.userTypeId === 1
+            ? 'Admin'
+            : 'User';
 
   const isActive = (path: string) => router.pathname === path;
 
@@ -88,8 +105,9 @@ export const Header = () => {
             {/* Home */}
             <Link
               href="/"
-              className={`font-medium transition-colors ${isActive('/') ? 'text-blue-600' : 'text-gray-800 hover:text-blue-600'
-                }`}
+              className={`font-medium transition-colors ${
+                isActive('/') ? 'text-blue-600' : 'text-gray-800 hover:text-blue-600'
+              }`}
             >
               Home
             </Link>
@@ -159,8 +177,9 @@ export const Header = () => {
             {/* Mentors */}
             <Link
               href="/mentors"
-              className={`font-medium transition-colors ${isActive('/mentors') ? 'text-blue-600' : 'text-gray-800 hover:text-blue-600'
-                }`}
+              className={`font-medium transition-colors ${
+                isActive('/mentors') ? 'text-blue-600' : 'text-gray-800 hover:text-blue-600'
+              }`}
             >
               Mentors
             </Link>
@@ -190,7 +209,9 @@ export const Header = () => {
                     <div className="px-4 py-3 border-b border-gray-100">
                       <p className="font-semibold text-gray-900">{userName}</p>
                       <p className="text-gray-500 text-xs truncate">{userEmail}</p>
-                      <p className="text-xs text-blue-600 capitalize font-medium mt-1">{userRole}</p>
+                      <p className="text-xs text-blue-600 capitalize font-medium mt-1">
+                        {userRole}
+                      </p>
                     </div>
                     <div className="py-1">
                       <Link href="/student-profile">
@@ -262,8 +283,9 @@ export const Header = () => {
                   <Link
                     key={href}
                     href={href}
-                    className={`px-3 py-2 rounded-md text-sm font-medium transition ${isActive ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'
-                      }`}
+                    className={`px-3 py-2 rounded-md text-sm font-medium transition ${
+                      isActive ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'
+                    }`}
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {label}

@@ -13,5 +13,3 @@ export const AUTH_APIS = {
   LOG_OUT: '/auth/logout',
   VERIFY_ME: '/auth/me',
 };
-
-
