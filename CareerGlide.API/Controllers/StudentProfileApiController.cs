@@ -220,8 +220,8 @@ namespace CareerGlide.API.Controllers
         /// </summary>
         /// 
 
-        [HttpPost("UpdateStudentResume")]
-        public async Task<IActionResult> UpdateStudentResume( string ResumePath)
+        [HttpPost("UploadStudentResume")]
+        public async Task<IActionResult> UploadStudentResume(IFormFile resumeFile)
         {
             var userIdClaim = User.FindFirst("userId")?.Value;
 
@@ -229,15 +229,57 @@ namespace CareerGlide.API.Controllers
             {
                 return Unauthorized(new { Message = "Invalid or missing user ID in token." });
             }
-            var response = await _studentProfileService.UpdateStudentResume(userId, ResumePath);
+
+            if (resumeFile == null || resumeFile.Length == 0)
+            {
+                return BadRequest(new { Message = "No file uploaded." });
+            }
+
+            // ✅ Allowed file types (only PDF, DOC, DOCX)
+            var allowedExtensions = new[] { ".pdf", ".doc", ".docx" };
+            var fileExtension = Path.GetExtension(resumeFile.FileName).ToLower();
+
+            if (!allowedExtensions.Contains(fileExtension))
+            {
+                return BadRequest(new { Message = "Invalid file type. Only PDF, DOC, DOCX allowed." });
+            }
+
+            // ✅ Save file in server
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "student", "resumes");
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            // Generate new filename => userId_originalName.ext
+            var safeFileName = Path.GetFileNameWithoutExtension(resumeFile.FileName);
+            safeFileName = string.Concat(safeFileName.Split(Path.GetInvalidFileNameChars())); // remove invalid chars
+            var fileName = $"{userId}_{safeFileName}{fileExtension}";
+            var filePath = Path.Combine(uploadsFolder, fileName);
+
+            // ✅ Delete old resume if exists for this user
+            var existingFiles = Directory.GetFiles(uploadsFolder, $"{userId}_*");
+            foreach (var oldFile in existingFiles)
+            {
+                if (System.IO.File.Exists(oldFile))
+                {
+                    System.IO.File.Delete(oldFile);
+                }
+            }
+
+            // Save new file
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await resumeFile.CopyToAsync(stream);
+            }
+
+            // ✅ Save relative path to DB
+            var response = await _studentProfileService.UpdateStudentResume(userId, fileName);
+
             if (response.Success)
-            {
                 return Ok(response);
-            }
-            else
-            {
-                return StatusCode(response.StatusCode, response.Message);
-            }
+
+            return StatusCode(response.StatusCode, response.Message);
         }
 
 
@@ -343,5 +385,11 @@ namespace CareerGlide.API.Controllers
             }
         }
         #endregion
+
+
+
+        
+
+
     }
 }

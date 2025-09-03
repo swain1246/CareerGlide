@@ -49,7 +49,8 @@ public class Program
                                     "https://careerglide-ui.onrender.com") 
                       .AllowAnyHeader()
                       .AllowAnyMethod()
-                      .AllowCredentials();
+                      .AllowCredentials()
+                      .SetIsOriginAllowedToAllowWildcardSubdomains(); // Add this
             });
         });
 
@@ -75,6 +76,7 @@ public class Program
         services.AddScoped<StudentActivityService>();
         services.AddScoped<MentorActivityService>();
         services.AddScoped<CommonService>();
+        services.AddScoped<MentorProfileService>();
 
 
         // JWT Authentication
@@ -112,7 +114,10 @@ public class Program
             c.RoutePrefix = "swagger";
         });
 
-        app.UseHttpsRedirection();
+        if (!app.Environment.IsDevelopment())
+        {
+            app.UseHttpsRedirection();
+        }
         // ?? Apply CORS before auth
         app.UseCors("AllowAll");
 
