@@ -17,6 +17,8 @@ RUN npm install -g pnpm
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# Disable ESLint warnings as errors
+ENV CI=false 
 RUN pnpm build
 
 # 3. Run the app

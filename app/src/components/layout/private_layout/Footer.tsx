@@ -33,9 +33,9 @@ export function Footer() {
           </p>
           <div className="flex space-x-4">
             {[
-              {icon: Twitter, color: 'hover:bg-blue-500', label: 'Twitter'},
-              {icon: Linkedin, color: 'hover:bg-blue-700', label: 'LinkedIn'},
-              {icon: Github, color: 'hover:bg-gray-700', label: 'GitHub'},
+              { icon: Twitter, color: 'hover:bg-blue-500', label: 'Twitter' },
+              { icon: Linkedin, color: 'hover:bg-blue-700', label: 'LinkedIn' },
+              { icon: Github, color: 'hover:bg-gray-700', label: 'GitHub' },
             ].map((item, idx) => (
               <a
                 key={idx}
@@ -57,10 +57,16 @@ export function Footer() {
           </h4>
           <ul className="space-y-3 text-gray-400">
             {[
-              {text: 'Dashboard', icon: <Briefcase className="w-4 h-4 mr-2 text-blue-400" />},
-              {text: 'Profile Settings', icon: <Settings className="w-4 h-4 mr-2 text-purple-400" />},
-              {text: 'Privacy & Security', icon: <Lock className="w-4 h-4 mr-2 text-green-400" />},
-              {text: 'Subscription', icon: <FileText className="w-4 h-4 mr-2 text-yellow-400" />},
+              { text: 'Dashboard', icon: <Briefcase className="w-4 h-4 mr-2 text-blue-400" /> },
+              {
+                text: 'Profile Settings',
+                icon: <Settings className="w-4 h-4 mr-2 text-purple-400" />,
+              },
+              {
+                text: 'Privacy & Security',
+                icon: <Lock className="w-4 h-4 mr-2 text-green-400" />,
+              },
+              { text: 'Subscription', icon: <FileText className="w-4 h-4 mr-2 text-yellow-400" /> },
             ].map((item) => (
               <li key={item.text} className="flex items-center">
                 {item.icon}
@@ -115,7 +121,7 @@ export function Footer() {
                 +1 (555) 123-4567
               </a>
             </div>
-            
+
             <div className="mt-6">
               <ul className="space-y-2 text-sm">
                 {['Help Center', 'FAQs', 'Report an Issue'].map((item) => (

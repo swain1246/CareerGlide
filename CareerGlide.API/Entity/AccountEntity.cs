@@ -112,7 +112,7 @@ namespace CareerGlide.API.Entity
         public string Email { get; set; }
     }
 
-    public class CheckLogin : IValidatableObject
+    public class CheckLogin 
     {
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Invalid email format")]
@@ -120,13 +120,6 @@ namespace CareerGlide.API.Entity
         [Required(ErrorMessage = "Password is required")]
         public string Password { get; set; }
 
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        {
-
-            foreach (var error in ValidationHelper.ValidatePassword(Password))
-                yield return error;
-
-        }
     }
 
     public class LoginEntity
@@ -138,6 +131,7 @@ namespace CareerGlide.API.Entity
         public string MentorName { get; set; }
         public string AdminName { get; set; }
         public string CompanyName { get; set; }
+        public string ProfileImage { get; set; }
         public string? UserToken { get; set; }
         public int StatusCode { get; set; }
         public string Message { get; set; }
@@ -174,4 +168,6 @@ namespace CareerGlide.API.Entity
 
         }
     }
+
+
 }

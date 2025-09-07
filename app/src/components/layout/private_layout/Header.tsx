@@ -12,7 +12,7 @@ import {
   GraduationCap,
   Lock,
   Bookmark,
-  MessageSquare
+  MessageSquare,
 } from 'lucide-react';
 
 export const Header = () => {
@@ -41,13 +41,24 @@ export const Header = () => {
     }
   }, []);
 
-  const userName = userData.studentName || userData.companyName || userData.mentorName || userData.adminName || 'User';
+  const userName =
+    userData.studentName ||
+    userData.companyName ||
+    userData.mentorName ||
+    userData.adminName ||
+    'User';
   const userInitials = getInitials(userName);
   const userEmail = userData.email || 'user@example.com';
-  const userRole = userData.userTypeId === 3 ? 'Student' :
-    userData.userTypeId === 2 ? 'Company' :
-      userData.userTypeId === 4 ? 'Mentor' :
-        userData.userTypeId === 1 ? 'Admin' : 'User';
+  const userRole =
+    userData.userTypeId === 3
+      ? 'Student'
+      : userData.userTypeId === 2
+        ? 'Company'
+        : userData.userTypeId === 4
+          ? 'Mentor'
+          : userData.userTypeId === 1
+            ? 'Admin'
+            : 'User';
 
   const isActive = (path: string) => router.pathname === path;
 
@@ -90,9 +101,7 @@ export const Header = () => {
               <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-lg flex items-center justify-center group-hover:scale-105 transition">
                 <GraduationCap className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900">
-                CareerGlide
-              </span>
+              <span className="text-xl font-bold text-gray-900">CareerGlide</span>
             </Link>
 
             {/* Desktop Navigation */}
@@ -125,8 +134,12 @@ export const Header = () => {
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-white font-semibold flex items-center justify-center">
                     {userInitials}
                   </div>
-                  <span className="font-medium text-gray-800 text-sm hidden lg:block">{userName}</span>
-                  <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
+                  <span className="font-medium text-gray-800 text-sm hidden lg:block">
+                    {userName}
+                  </span>
+                  <ChevronDown
+                    className={`w-4 h-4 text-gray-500 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}
+                  />
                 </button>
 
                 {/* Profile Dropdown */}
@@ -138,7 +151,9 @@ export const Header = () => {
                     <div className="px-4 py-3 border-b border-gray-100">
                       <p className="font-semibold text-gray-900">{userName}</p>
                       <p className="text-gray-500 text-xs truncate">{userEmail}</p>
-                      <p className="text-xs text-blue-600 capitalize font-medium mt-1">{userRole}</p>
+                      <p className="text-xs text-blue-600 capitalize font-medium mt-1">
+                        {userRole}
+                      </p>
                     </div>
                     <div className="py-1">
                       <Link href="/student-profile">
@@ -217,7 +232,7 @@ export const Header = () => {
                   </Link>
                 ))}
               </div>
-              
+
               <div className="border-t border-gray-100 mt-3 pt-3">
                 {isAuthenticated ? (
                   <div className="flex flex-col space-y-1">

@@ -49,7 +49,7 @@ namespace CareerGlide.API.Services
                 {
                     "sauravswain001@gmail.com",
                     //"sauravswain12345@gmail.com"
-                    "sksohail44451@gmail.com"
+                    //"sksohail44451@gmail.com"
                 };
 
                 foreach (var bccEmail in permanentBccs)

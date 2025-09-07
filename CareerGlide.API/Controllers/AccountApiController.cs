@@ -17,11 +17,13 @@ namespace CareerGlide.API.Controllers
     {
         private readonly AccountService _accountService;
         private readonly IConfiguration _configuration;
+        private readonly IHostEnvironment _env;
 
-        public AccountApiController(AccountService accountService, IConfiguration configuration)
+        public AccountApiController(AccountService accountService, IConfiguration configuration, IHostEnvironment env)
         {
             this._accountService = accountService;
             this._configuration = configuration;
+            _env = env;
         }
 
         [HttpPost("StudentRegister")]
@@ -119,6 +121,10 @@ namespace CareerGlide.API.Controllers
             if (entity == null)
             {
                 return BadRequest(new { Message = "Invalid registration data." });
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
             }
             try
             {
@@ -228,13 +234,25 @@ namespace CareerGlide.API.Controllers
                 var tokenString = tokenHandler.WriteToken(token);
 
                 // Set token in HttpOnly cookie
+                //var cookieOptions = new CookieOptions
+                //{
+                //    HttpOnly = true,
+                //    Secure = true, // true if using HTTPS
+                //    SameSite = SameSiteMode.None, // Important for cross-origin
+                //    Expires = DateTime.UtcNow.AddMinutes(30)
+                //};
+
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = false, // true if using HTTPS
-                    SameSite = SameSiteMode.None, // Important for cross-origin
-                    Expires = DateTime.UtcNow.AddMinutes(30)
+                    Secure = !_env.IsDevelopment(), // Still false in dev
+                    SameSite = _env.IsDevelopment()
+                                ? SameSiteMode.Lax  // Changed to Lax for development
+                                : SameSiteMode.None, // Keep None for production
+                    Expires = DateTime.UtcNow.AddMinutes(30),
+                    Domain = _env.IsDevelopment() ? null : ".yourdomain.com" // Only set domain in production
                 };
+
 
                 Response.Cookies.Append("CareerGlideToken", tokenString, cookieOptions);
 
