@@ -128,6 +128,40 @@ namespace CareerGlide.API.Services
             }
         }
 
+        ///<summary>
+        ///Change Password
+        ///</summary>
+        ///
+
+        public async Task<ApiResponse<string>> ChangePassword(int UserId, ChangePasswordEntity entity)
+        {
+            try
+            {
+                var parameters = new SqlParameter[]{
+                    new SqlParameter("@UserId", SqlDbType.Int) { Value = UserId },
+                    new SqlParameter("@CurrentPassword", SqlDbType.Text) { Value = entity.CurrentPassword },
+                    new SqlParameter("@NewPassword", SqlDbType.Text) { Value = entity.NewPassword },
+                };
+
+                var result = await _genericRepository.GetAsync<dynamic>("ChangePassword", parameters);
+
+                if(result.IsSuccess == 1)
+                {
+                    return new ApiResponse<string>(null, result.Message, true, 200);
+                }
+                else if (result.IsSuccess == -1)
+                {
+                    return new ApiResponse<string>(null, result.Message, false, 400);
+                }
+                return new ApiResponse<string>(null, "Failed to change the password", false, 400);
+
+            }
+            catch(Exception ex)
+            {
+                return new ApiResponse<string>(null, $"Error While change password : {ex.Message}", false, 500);
+            }
+        }
+
         /// <summary>
         /// Delete User Account
         /// </summary>

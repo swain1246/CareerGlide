@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Azure;
+using CareerGlide.API.Entity;
 using CareerGlide.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -133,6 +134,28 @@ namespace CareerGlide.API.Controllers
                 return Unauthorized("Email not found in token.");
 
             return Ok(new { Email = email, UserId = userId });
+        }
+
+        /// <summary>
+        /// Change Password
+        /// </summary>
+        /// 
+
+        [HttpPut("ChangePassword")]
+        public async Task<IActionResult> ChangePassword(ChangePasswordEntity entity)
+        {
+            var userIdClaim = User.FindFirst("userId")?.Value;
+
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+            {
+                return Unauthorized(new { Message = "Invalid or missing user ID in token." });
+            }
+
+            var response = await _userService.ChangePassword(userId, entity);
+
+            
+                return Ok(response);
+           
         }
 
         /// <summary>

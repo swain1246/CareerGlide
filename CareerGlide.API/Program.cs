@@ -77,6 +77,7 @@ public class Program
         services.AddScoped<MentorActivityService>();
         services.AddScoped<CommonService>();
         services.AddScoped<MentorProfileService>();
+        services.AddScoped<AdminActivityService>();
 
 
         // JWT Authentication

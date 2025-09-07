@@ -13,6 +13,13 @@
         public string SenderName { get; set; }
     }
 
+    public class PaginationEntity
+    {
+        public int PageNumber { get; set; }
+        public int PageSize { get; set; }
+        public int UserType { get; set; }
+    }
+
     public class BindTechnicalStacks
     {
         public int StackId { get; set; }
