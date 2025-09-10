@@ -244,14 +244,14 @@ namespace CareerGlide.API.Controllers
 
                 var cookieOptions = new CookieOptions
                 {
-                    HttpOnly = true,
-                    Secure = !_env.IsDevelopment(), // Still false in dev
+                    HttpOnly = true,                           // protect against JS access
+                    Secure = !_env.IsDevelopment(),            // only true in production (Render uses HTTPS)
                     SameSite = _env.IsDevelopment()
-                                ? SameSiteMode.Lax  // Changed to Lax for development
-                                : SameSiteMode.None, // Keep None for production
-                    Expires = DateTime.UtcNow.AddMinutes(30),
-                    Domain = _env.IsDevelopment() ? null : ".yourdomain.com" // Only set domain in production
+                                ? SameSiteMode.Lax             // dev: works with localhost:3000 → localhost:5000
+                                : SameSiteMode.None,           // prod: required for cross-site cookies
+                    Expires = DateTime.UtcNow.AddDays(1)
                 };
+
 
 
                 Response.Cookies.Append("CareerGlideToken", tokenString, cookieOptions);
